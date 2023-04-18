@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry output="bin/main" kind="src" path="src/main/java">
+		<attributes>
+			<attribute name="gradle_scope" value="main"/>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry output="bin/main" kind="src" path="src/main/resources">
+		<attributes>
+			<attribute name="gradle_scope" value="main"/>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry output="bin/test" kind="src" path="src/test/java">
+		<attributes>
+			<attribute name="gradle_scope" value="test"/>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry output="bin/test" kind="src" path="src/test/resources">
+		<attributes>
+			<attribute name="gradle_scope" value="test"/>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin/default"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17/"/>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.20.0/dcff7bf4ae8a02121c3d9ea326f4c1e8efbf9306/log4j-core-2.20.0-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.20.0/eb2a9a47b1396e00b5eee1264296729a70565cc0/log4j-core-2.20.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.20.0/646229509a21876eb5e6434f24ec3164665c6c38/log4j-api-2.20.0-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.20.0/1fe6082e660daf07c689a89c94dc0f49c26b44bb/log4j-api-2.20.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/5.9.2/6dc22e4af51cac3e98fe10e0807fee878c79bb59/junit-jupiter-params-5.9.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/5.9.2/bc2765afb7b85b583c710dd259a11c6b8c39e912/junit-jupiter-params-5.9.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.9.2/5232572dbe6548235580494edb226fed76109643/junit-jupiter-api-5.9.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/5.9.2/fed843581520eac594bc36bb4b0f55e7b947dda9/junit-jupiter-api-5.9.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.9.2/44bff8441bcb66b817b5a9d5c1a6717cdf26dbde/junit-platform-commons-1.9.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/1.9.2/6f9f8621d8230cd38aa42e58ccbc0c00569131ce/junit-platform-commons-1.9.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter/5.9.2/5fd01c33132462aab3905cb74bd1097a713ab91a/junit-jupiter-5.9.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter/5.9.2/26c586fbe0ebd81b48c9f11f0d998124248697ae/junit-jupiter-5.9.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/41d55b3c2254de9837b4ec8923cbd371b8a7eab5/opentest4j-1.2.0-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/28c11eb91f9b6d8e200631d46e20a7f407f2a046/opentest4j-1.2.0.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/e0787a997746ac32639e0bf3cb27af8dce8a3428/apiguardian-api-1.1.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/a231e0d844d2721b0fa1b238006d15c6ded6842a/apiguardian-api-1.1.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value=""/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.9.2/128d5b5b681442f6eeab0c8c17825983cc233d68/junit-jupiter-engine-5.9.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/5.9.2/572f7a553b53f83ee59cc045ce1c3772864ab76c/junit-jupiter-engine-5.9.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.9.2/819f0849cf19b1f46718c36a4fc8406c87bced45/junit-platform-engine-1.9.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/1.9.2/40aeef2be7b04f96bb91e8b054affc28b7c7c935/junit-platform-engine-1.9.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+</classpath>
