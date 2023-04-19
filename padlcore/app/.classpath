@@ -38,6 +38,31 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.2/e3c1c58faa2bc0d8c3b40e478102eb2ffba07ce3/jackson-databind-2.14.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.14.2/1e71fddbc80bb86f71a6345ac1e8ab8a00e7134/jackson-databind-2.14.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.2/3d74e455fa89503ce195b9cb87a29612060f9cc8/jackson-annotations-2.14.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.14.2/a7aae9525864930723e3453ab799521fdfd9d873/jackson-annotations-2.14.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.14.2/1a2fb839e02d2ba74f760c77a41bce5b1cd7c69e/jackson-dataformat-yaml-2.14.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.14.2/cc9a25c1f4212562dcb2fa33dd8ae179ba0e6a4e/jackson-dataformat-yaml-2.14.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.2/8217d78341a78cd2fbc69f26372e40d38f8767da/jackson-core-2.14.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.14.2/f804090e6399ce0cf78242db086017512dd71fcc/jackson-core-2.14.2.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/1.33/97257a0e34679175cc00444a64fa42d6bb53e23f/snakeyaml-1.33-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/1.33/2cd0a87ff7df953f810c344bdf2fe3340b954c69/snakeyaml-1.33.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/5.9.2/6dc22e4af51cac3e98fe10e0807fee878c79bb59/junit-jupiter-params-5.9.2-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/5.9.2/bc2765afb7b85b583c710dd259a11c6b8c39e912/junit-jupiter-params-5.9.2.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="test"/>
