@@ -48,6 +48,7 @@ public class Orchestrator {
 		}
 	}
 
+
 	public void configureEnvironment(String configurationFilename) {
 		logger.trace(".configureEnvironment [configurationFilename: {}]", configurationFilename);
 		configManager = ConfigurationFactory.getInstance(Paths.get(configurationFilename));

@@ -12,8 +12,6 @@ import com.alefzero.padlbridge.util.PInfo;
 public class ConfigurationFactory {
 	protected static final Logger logger = LogManager.getLogger();
 
-	private static ConfigurationManager manager = new ConfigurationManager();
-
 	private ConfigurationFactory() {
 		super();
 	}
@@ -26,8 +24,9 @@ public class ConfigurationFactory {
 					configurationFile.toFile().getAbsolutePath());
 			throw new PadlUnrecoverableError(message);
 		}
-
-		return manager;
+				
+		ConfigurationManager manager = new ConfigurationManager(configurationFile);
+		return manager ;
 	}
 
 }
