@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class MessageService {
+public class PInfo {
 	protected static final Logger logger = LogManager.getLogger();
 	
 	private static final String BUNDLE_NAME = "locale/messages/padl";
@@ -15,7 +15,7 @@ public class MessageService {
 	private static ResourceBundle msgBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	private static ResourceBundle logBundle = ResourceBundle.getBundle(LOG_BUNDLE_NAME);
 	
-	private MessageService() {
+	private PInfo() {
 		super();
 	}
 	

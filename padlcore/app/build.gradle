@@ -14,9 +14,16 @@ compileTestJava.options.encoding = 'UTF-8'
 applicationDefaultJvmArgs = ['-Xms1G', '-Xmx4G', '-XX:+ExitOnOutOfMemoryError']
 
 dependencies {
+    
+    // Log4J2 logging
     implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
     
+    // Jackson YAML processor
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.3'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.3'
+    
+    // Test suite
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 

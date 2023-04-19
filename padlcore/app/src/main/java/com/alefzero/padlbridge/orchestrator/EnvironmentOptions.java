@@ -1,4 +1,4 @@
-package com.alefzero.padlbridge.core;
+package com.alefzero.padlbridge.orchestrator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

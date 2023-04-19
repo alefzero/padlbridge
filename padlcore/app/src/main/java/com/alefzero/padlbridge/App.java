@@ -1,14 +1,15 @@
 package com.alefzero.padlbridge;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.alefzero.padlbridge.core.Orchestrator;
+import com.alefzero.padlbridge.orchestrator.Orchestrator;
 
 /**
- * Padl Bridge Entry pointÏ
+ * Padl Bridge Entry point
  * 
  * @author xandecelo
  *
@@ -32,6 +33,17 @@ public class App {
 
 	private void run(String action, String configurationFilename) {
 		logger.trace(".process [action: {}, configurationFilename: {}]", action, configurationFilename);
-		Orchestrator.bootstrap(action, configurationFilename);
+		setupFromOSEnvironmentVariables();
+		new Orchestrator().bootstrap(action, configurationFilename);
+	}
+
+	private void setupFromOSEnvironmentVariables() {
+		logger.trace(".setupFromSOEnvironmentVariables");
+		String padlLang = System.getenv("PADL_LANG");
+		logger.trace("padlLang = {} ", padlLang);
+		if (padlLang != null) {
+			logger.debug("Setting language to {} per PADL_LANG variable from OS", padlLang);
+			Locale.setDefault(new Locale(padlLang));
+		}
 	}
 }
