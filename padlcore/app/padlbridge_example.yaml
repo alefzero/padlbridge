@@ -1,0 +1,23 @@
+# App configuration
+general:
+  lang: pt_BR
+# target ldap configuration
+target:
+  host: targethost
+  port: 10389
+  useTLS: false
+  rootDN: dc=padlbridge,dc=alefzero,dc=com
+# data sources
+sources:
+- id: source1
+  type: config
+- id: source2
+  type: structure
+- id: source3
+  type: ldap
+  host: anotherhost
+  port: 389
+- id: source4
+  type: database
+  query: select 1 from dual
+  
