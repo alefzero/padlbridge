@@ -16,20 +16,22 @@ import com.alefzero.padlbridge.util.PInfo;
  * @author xandecelo
  *
  */
-public class Orchestrator {
+public class PBOrchestrator {
 	protected static final Logger logger = LogManager.getLogger();
 
 	// PadlBridge components
 	private ConfigurationManager configManager = null;
 
-	public Orchestrator() {
+	public PBOrchestrator() {
 		super();
 	}
 
 	public void bootstrap(String action, String configurationFilename) {
 		logger.trace(".bootstrap [action: {}, configurationFilename: {}]", action, configurationFilename);
 
-		this.configureEnvironment(configurationFilename);
+		PBBootstrap.init();
+		
+		///this.configureEnvironment(configurationFilename);
 
 		switch (action.toLowerCase()) {
 		case "getenv":

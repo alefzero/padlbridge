@@ -6,7 +6,7 @@ import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.alefzero.padlbridge.orchestrator.Orchestrator;
+import com.alefzero.padlbridge.orchestrator.PBOrchestrator;
 
 /**
  * Padl Bridge Entry point
@@ -34,7 +34,7 @@ public class App {
 	private void run(String action, String configurationFilename) {
 		logger.trace(".process [action: {}, configurationFilename: {}]", action, configurationFilename);
 		setupFromOSEnvironmentVariables();
-		new Orchestrator().bootstrap(action, configurationFilename);
+		new PBOrchestrator().bootstrap(action, configurationFilename);
 	}
 
 	private void setupFromOSEnvironmentVariables() {

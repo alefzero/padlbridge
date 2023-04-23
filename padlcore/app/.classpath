@@ -87,6 +87,12 @@
 			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.unboundid/unboundid-ldapsdk/6.0.8/5143edd0a0bb8753e611b3d7ef88d84fb019931c/unboundid-ldapsdk-6.0.8-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/com.unboundid/unboundid-ldapsdk/6.0.8/be51c60f25ece7080f0eed5115f75f13937ae6d8/unboundid-ldapsdk-6.0.8.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="test"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry sourcepath="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/41d55b3c2254de9837b4ec8923cbd371b8a7eab5/opentest4j-1.2.0-sources.jar" kind="lib" path="/Users/xandecelo/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.2.0/28c11eb91f9b6d8e200631d46e20a7f407f2a046/opentest4j-1.2.0.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="test"/>

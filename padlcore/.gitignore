@@ -1,3 +1,6 @@
+# OS attributes
+.DS_Store
+
 # Ignore Gradle project-specific cache directory
 .gradle
 

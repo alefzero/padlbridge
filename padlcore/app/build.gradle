@@ -1,6 +1,7 @@
 plugins {
     id 'application'
     id 'eclipse'
+    id 'com.adarshr.test-logger' version '3.2.0'
 }
 
 repositories {
@@ -27,6 +28,7 @@ dependencies {
     
     // Test suite
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testImplementation 'com.unboundid:unboundid-ldapsdk:6.0.8'
 }
 
 application {
@@ -34,8 +36,12 @@ application {
 }
 
 tasks.named('test') {
+    // Use JUnit Platform for unit tests.
     useJUnitPlatform()
     testLogging {
+    
+        events "PASSED", "SKIPPED", "FAILED", "STANDARD_OUT", "STANDARD_ERROR"
+        outputs.upToDateWhen { false }
         showStandardStreams = true
     }
 }

@@ -1,0 +1,23 @@
+dn: dc=example,dc=com
+objectClass: domain
+objectClass: top
+dc: example
+
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: uid=user1,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: User One
+sn: One
+uid: user1
+
+dn: uid=user2,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: User One
+sn: One
+uid: user1
+
+
