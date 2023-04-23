@@ -1,12 +1,16 @@
 package com.alefzero.padlbridge;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.alefzero.padlbridge.config.PBConfigManager;
+import com.alefzero.padlbridge.config.model.UserConfig;
 import com.alefzero.padlbridge.orchestrator.PBOrchestrator;
+import com.alefzero.padlbridge.orchestrator.PBServiceManager;
 
 /**
  * Padl Bridge Entry point
@@ -32,9 +36,13 @@ public class App {
 	}
 
 	private void run(String action, String configurationFilename) {
-		logger.trace(".process [action: {}, configurationFilename: {}]", action, configurationFilename);
+		logger.trace(".run [action: {}, configurationFilename: {}]", action, configurationFilename);
 		setupFromOSEnvironmentVariables();
-		new PBOrchestrator().bootstrap(action, configurationFilename);
+
+		PBServiceManager serviceManager = new PBServiceManager();
+		UserConfig userConfig = PBConfigManager.getConfigurationFor(Paths.get(configurationFilename), serviceManager);
+
+		new PBOrchestrator().bootstrap(action, configurationFilename, serviceManager);
 	}
 
 	private void setupFromOSEnvironmentVariables() {

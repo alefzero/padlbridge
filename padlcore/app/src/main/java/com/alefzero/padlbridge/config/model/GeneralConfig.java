@@ -1,6 +1,7 @@
 package com.alefzero.padlbridge.config.model;
 
 public class GeneralConfig {
+
 	private String lang;
 	private String version;
 

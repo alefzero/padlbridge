@@ -1,13 +1,8 @@
 package com.alefzero.padlbridge.orchestrator;
 
-
-import java.nio.file.Paths;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.alefzero.padlbridge.config.ConfigurationFactory;
-import com.alefzero.padlbridge.config.ConfigurationManager;
 import com.alefzero.padlbridge.util.PInfo;
 
 /**
@@ -19,19 +14,12 @@ import com.alefzero.padlbridge.util.PInfo;
 public class PBOrchestrator {
 	protected static final Logger logger = LogManager.getLogger();
 
-	// PadlBridge components
-	private ConfigurationManager configManager = null;
-
 	public PBOrchestrator() {
 		super();
 	}
 
-	public void bootstrap(String action, String configurationFilename) {
+	public void bootstrap(String action, String configurationFilename, PBServiceManager serviceManager) {
 		logger.trace(".bootstrap [action: {}, configurationFilename: {}]", action, configurationFilename);
-
-		PBBootstrap.init();
-		
-		///this.configureEnvironment(configurationFilename);
 
 		switch (action.toLowerCase()) {
 		case "getenv":
@@ -48,12 +36,6 @@ public class PBOrchestrator {
 			this.help();
 			break;
 		}
-	}
-
-	public void configureEnvironment(String configurationFilename) {
-		logger.trace(".configureEnvironment [configurationFilename: {}]", configurationFilename);
-		configManager = ConfigurationFactory.getInstance(Paths.get(configurationFilename));
-		logger.trace(PInfo.log("orchestrator.configureEnvironment.targetConfigLoaded"), configManager.getTargetLDAPConfig());
 	}
 
 	public void getEnvironmentVariablesFromYAML(EnvironmentOptions osSyntax) {
