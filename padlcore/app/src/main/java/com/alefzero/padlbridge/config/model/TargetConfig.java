@@ -12,7 +12,6 @@ public class TargetConfig {
 		this.type = type;
 	}
 
-
 	@Override
 	public String toString() {
 		return "TargetConfig [type=" + type + "]";

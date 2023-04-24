@@ -66,13 +66,13 @@ public class PBServiceManager {
 	}
 
 	public PBTargetFactory getTargetById(String targetFactoryId) {
-		return Objects.requireNonNull(targetFactories.get(targetFactoryId), String
-				.format("Service type %s found in configuration isn't available at this runtime.", targetFactoryId));
+		return Objects.requireNonNull(targetFactories.get(targetFactoryId),
+				String.format(PInfo.msg("orchestrator.serviceManager.componentNotFound"), targetFactoryId));
 	}
 
 	public PBSourceFactory getSourceById(String sourceFactoryId) {
-		return Objects.requireNonNull(sourceFactories.get(sourceFactoryId), String
-				.format("Service type %s found in configuration isn't available at this runtime.", sourceFactoryId));
+		return Objects.requireNonNull(sourceFactories.get(sourceFactoryId),
+				String.format(PInfo.msg("orchestrator.serviceManager.componentNotFound"), sourceFactoryId));
 	}
 
 }
