@@ -1,5 +1,6 @@
 package com.alefzero.padlbridge.sources;
 
+import com.alefzero.padlbridge.config.model.SourceConfig;
 import com.alefzero.padlbridge.orchestrator.PBGenericService;
 
 /**
@@ -7,6 +8,7 @@ import com.alefzero.padlbridge.orchestrator.PBGenericService;
  * 
  * @author xandecelo
  */
-public interface PBSourceService extends PBGenericService {
+public abstract class PBSourceService extends PBGenericService<SourceConfig> {
+
 
 }

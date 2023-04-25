@@ -1,6 +1,6 @@
 package com.alefzero.padlbridge.config.model;
 
-public class TargetConfig  implements PBGenericConfig {
+public class CacheConfig implements PBGenericConfig {
 
 	private String type;
 
@@ -14,7 +14,7 @@ public class TargetConfig  implements PBGenericConfig {
 
 	@Override
 	public String toString() {
-		return "TargetConfig [type=" + type + "]";
+		return "CacheConfig [type=" + type + "]";
 	}
 
 }

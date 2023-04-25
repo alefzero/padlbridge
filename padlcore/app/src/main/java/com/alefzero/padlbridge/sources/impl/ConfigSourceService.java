@@ -1,8 +1,8 @@
 package com.alefzero.padlbridge.sources.impl;
 
-import com.alefzero.padlbridge.orchestrator.PBGenericService;
+import com.alefzero.padlbridge.sources.PBSourceService;
 
-public class ConfigSourceService implements PBGenericService {
+public class ConfigSourceService  extends PBSourceService {
 
 	@Override
 	public String toString() {

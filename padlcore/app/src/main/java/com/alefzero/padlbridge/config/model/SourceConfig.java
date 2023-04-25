@@ -1,6 +1,6 @@
 package com.alefzero.padlbridge.config.model;
 
-public class SourceConfig {
+public class SourceConfig  implements PBGenericConfig {
 
 	private String type;
 	private String name;
@@ -25,5 +25,4 @@ public class SourceConfig {
 	public String toString() {
 		return "SourceConfig [type=" + type + "]";
 	}
-
 }

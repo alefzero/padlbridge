@@ -1,9 +1,14 @@
 package com.alefzero.padlbridge.orchestrator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.alefzero.padlbridge.util.PInfo;
+import com.alefzero.padlbridge.cache.PBCacheService;
+import com.alefzero.padlbridge.sources.PBSourceService;
+import com.alefzero.padlbridge.targets.PBTargetService;
 
 /**
  * Bootstrap and control the application actions
@@ -14,37 +19,39 @@ import com.alefzero.padlbridge.util.PInfo;
 public class PBOrchestrator {
 	protected static final Logger logger = LogManager.getLogger();
 
-	public PBOrchestrator() {
+	private PBCacheService cache;
+	private PBTargetService target;
+	private List<PBSourceService> sources;
+	private List<PBSourceService> sourcesInReverseOrder;
+
+	public PBOrchestrator(PBLoadedServices services) {
 		super();
+		cache = services.getCache();
+		target = services.getTarget();
+		sources = services.getSources();
+		sourcesInReverseOrder = new ArrayList<PBSourceService>();
+		sources.forEach(source -> sourcesInReverseOrder.add(0, source));
 	}
 
-	public void bootstrap(String action, String configurationFilename, PBServiceManager serviceManager) {
-		logger.trace(".bootstrap [action: {}, configurationFilename: {}]", action, configurationFilename);
+	public void sync() {
 
-		switch (action.toLowerCase()) {
-		case "getenv":
-			this.getEnvironmentVariablesFromYAML(EnvironmentOptions.getFromSO());
-			break;
-		case "load":
-			break;
-		case "update":
-			break;
-		case "keepInSync":
-			break;
-		case "help":
-		default:
-			this.help();
-			break;
-		}
-	}
+		cache.prepare();
+		sources.forEach(source -> {
+			cache.addHashesFrom(source);
+		});
 
-	public void getEnvironmentVariablesFromYAML(EnvironmentOptions osSyntax) {
-		logger.trace(".getEnvironmentVariablesFromYAML [osSyntax: {}]", osSyntax);
-	}
+		cache.consolidate();
 
-	private void help() {
-		logger.trace(".help");
-		System.out.println(PInfo.msg("app.welcome-version"));
-		System.out.println(PInfo.msg("app.help"));
+		sourcesInReverseOrder.forEach(source -> {
+			target.deleteAll(cache.getDeletedEntriesFrom(source));
+		});
+
+		sources.forEach(source -> {
+			target.addAll(cache.getEntriesToAddFrom(source));
+			target.modifyAll(cache.getEntriesToModifyFrom(source));
+		});
+		
+		cache.updateTables();
+		
 	}
 }
