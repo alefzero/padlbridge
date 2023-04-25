@@ -3,21 +3,21 @@ package com.alefzero.padlbridge.targets.impl;
 import com.alefzero.padlbridge.orchestrator.PBGenericService;
 import com.alefzero.padlbridge.targets.PBTargetFactory;
 
-public class Target1Factory implements PBTargetFactory {
+public class GenericLdapTargetFactory implements PBTargetFactory {
 
 	@Override
 	public String getServiceType() {
-		return "target1";
+		return "generic-ldap";
 	}
 
 	@Override
 	public PBGenericService getInstance() {
-		return new Target1Service();
+		return new GenericLdapTargetService();
 	}
 
 	@Override
-	public Class<Target1Config> getConfigClass() {
-		return Target1Config.class;
+	public Class<GenericLdapTargetConfig> getConfigClass() {
+		return GenericLdapTargetConfig.class;
 	}
 
 }

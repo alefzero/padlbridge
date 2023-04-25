@@ -4,6 +4,7 @@ public class GeneralConfig {
 
 	private String lang;
 	private String version;
+	private String instanceId;
 
 	public String getLang() {
 		return lang;
@@ -21,9 +22,17 @@ public class GeneralConfig {
 		this.version = version;
 	}
 
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
+	}
+
 	@Override
 	public String toString() {
-		return "GeneralConfig [lang=" + lang + ", version=" + version + "]";
+		return "GeneralConfig [lang=" + lang + ", version=" + version + ", instanceId=" + instanceId + "]";
 	}
 
 }

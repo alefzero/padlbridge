@@ -2,12 +2,14 @@ package com.alefzero.padlbridge.targets.impl;
 
 import com.alefzero.padlbridge.config.model.TargetConfig;
 
-public class Target1Config extends TargetConfig {
+public class GenericLdapTargetConfig extends TargetConfig {
 
 	private String host;
 	private int port = 10389;
 	private String useTLS;
 	private String rootDN;
+	private String adminPassword;
+	private String adminUser;
 
 	public String getHost() {
 		return host;
@@ -41,10 +43,26 @@ public class Target1Config extends TargetConfig {
 		this.rootDN = rootDN;
 	}
 
+	public String getAdminPassword() {
+		return adminPassword;
+	}
+
+	public void setAdminPassword(String adminPassword) {
+		this.adminPassword = adminPassword;
+	}
+
+	public String getAdminUser() {
+		return adminUser;
+	}
+
+	public void setAdminUser(String adminUser) {
+		this.adminUser = adminUser;
+	}
+
 	@Override
 	public String toString() {
-		return "Target1Config [type=" + super.getType() + ", host=" + host + ", port=" + port + ", useTLS=" + useTLS
-				+ ", rootDN=" + rootDN + "]";
+		return "GenericLdapConfig [host=" + host + ", port=" + port + ", useTLS=" + useTLS + ", rootDN=" + rootDN
+				+ ", adminPassword=" + adminPassword + ", adminUser=" + adminUser + ", getType()=" + getType() + "]";
 	}
 
 }
