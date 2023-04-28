@@ -1,20 +1,20 @@
-dn: dc=example,dc=com
+dn: dc=alefzero,dc=com
 objectClass: domain
 objectClass: top
-dc: example
+dc: alefzero
 
-dn: ou=users,dc=example,dc=com
+dn: ou=users,dc=alefzero,dc=com
 objectClass: organizationalUnit
 objectClass: top
 ou: users
 
-dn: uid=user1,ou=users,dc=example,dc=com
+dn: uid=user1,ou=users,dc=alefzero,dc=com
 objectClass: inetOrgPerson
 cn: User One
 sn: One
 uid: user1
 
-dn: uid=user2,ou=users,dc=example,dc=com
+dn: uid=user2,ou=users,dc=alefzero,dc=com
 objectClass: inetOrgPerson
 cn: User One
 sn: One

@@ -1,2 +1,3 @@
 com.alefzero.padlbridge.sources.impl.LdapSourceFactory
 com.alefzero.padlbridge.sources.impl.ConfigSourceFactory
+com.alefzero.padlbridge.sources.impl.DBSourceFactory

@@ -26,7 +26,7 @@ class AppTest {
 	@Test
 	void loadLDAP() {
 		try {
-			InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("dc=example,dc=com");
+			InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("dc=alefzero,dc=com");
 			config.addAdditionalBindCredentials("cn=admin", "password1");
 			config.setListenerConfigs(InMemoryListenerConfig.createLDAPConfig("lsn", 10389));
 			try (
@@ -39,14 +39,14 @@ class AppTest {
 				// Get a client connection to the server and use it to perform various
 				// operations.
 				LDAPConnection conn = ds.getConnection();
-				SearchResultEntry entry = conn.getEntry("dc=example,dc=com");
+				SearchResultEntry entry = conn.getEntry("dc=alefzero,dc=com");
 
 				System.out.println("Entry data; {}" + entry);
 				logger.info("Entry data; {}", entry);
 
 				assertNotNull(entry);
 
-				Thread.sleep(60000);
+				Thread.sleep(1);
 
 				// Disconnect from the server and cause the server to shut down.
 				conn.close();

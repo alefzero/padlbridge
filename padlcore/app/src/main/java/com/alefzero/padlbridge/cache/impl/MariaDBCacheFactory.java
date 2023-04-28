@@ -19,8 +19,8 @@ public class MariaDBCacheFactory implements PBCacheFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Class<CacheConfig> getConfigClass() {
-		return CacheConfig.class;
+	public Class<MariaDBCacheConfig> getConfigClass() {
+		return MariaDBCacheConfig.class;
 	}
 
 }

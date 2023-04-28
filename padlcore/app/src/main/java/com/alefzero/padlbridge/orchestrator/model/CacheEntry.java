@@ -2,12 +2,13 @@ package com.alefzero.padlbridge.orchestrator.model;
 
 import java.util.Objects;
 
-public class CachedEntry implements Comparable<CachedEntry> {
+public class CacheEntry {
 
 	private String dn;
+	private String uid;
 	private String hash;
 
-	public CachedEntry(String dn) {
+	public CacheEntry(String dn) {
 		super();
 		Objects.requireNonNull(dn);
 		this.dn = dn;
@@ -29,11 +30,12 @@ public class CachedEntry implements Comparable<CachedEntry> {
 		this.hash = hash;
 	}
 
-	@Override
-	public int compareTo(CachedEntry o) {
-		Objects.requireNonNull(o);
-		return dn.compareToIgnoreCase(o.dn);
+	public String getUid() {
+		return uid;
 	}
 
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
 
 }

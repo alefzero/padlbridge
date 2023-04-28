@@ -1,9 +1,10 @@
 package com.alefzero.padlbridge.config.model;
 
-public class SourceConfig  implements PBGenericConfig {
+public class SourceConfig implements PBGenericConfig {
 
 	private String type;
 	private String name;
+	private String dn;
 
 	public String getType() {
 		return type;
@@ -21,8 +22,17 @@ public class SourceConfig  implements PBGenericConfig {
 		this.name = name;
 	}
 
+	public String getDn() {
+		return dn;
+	}
+
+	public void setDn(String dn) {
+		this.dn = dn;
+	}
+
 	@Override
 	public String toString() {
-		return "SourceConfig [type=" + type + "]";
+		return "SourceConfig [type=" + type + ", name=" + name + ", dn=" + dn + "]";
 	}
+
 }

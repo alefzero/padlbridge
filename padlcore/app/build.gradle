@@ -14,25 +14,37 @@ compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 applicationDefaultJvmArgs = ['-Xms1G', '-Xmx4G', '-XX:+ExitOnOutOfMemoryError']
 
-dependencies {
-    
+dependencies {    
     // Log4J2 logging
     implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    implementation 'org.apache.logging.log4j:log4j-jcl:2.20.0'
+    implementation 'commons-logging:commons-logging:1.2'
     
     // Jackson YAML processor
     implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2'
-    // implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.14.2'
+
+    // Cache control
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.0'
+    implementation 'org.apache.commons:commons-dbcp2:2.9.0'
     
+    // Ldap api
+    implementation 'com.unboundid:unboundid-ldapsdk:6.0.8'
     
     // Test suite
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-    testImplementation 'com.unboundid:unboundid-ldapsdk:6.0.8'
+    testImplementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.6.0'
+    testImplementation 'org.xerial:sqlite-jdbc:3.41.2.1'
+    
 }
 
 application {
     mainClass = 'com.alefzero.padlbridge.App'
+}
+
+manifest {
+        attributes('Class-Path' : 'libs' )
 }
 
 tasks.named('test') {

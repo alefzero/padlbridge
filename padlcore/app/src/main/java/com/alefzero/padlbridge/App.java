@@ -67,11 +67,9 @@ public class App {
 
 	private void runSyncProcess(String configurationFilename) {
 		logger.trace(".runSyncProcess [configurationFilename: {}]", configurationFilename);
-		
 		PBServiceManager serviceManager = new PBServiceManager(Paths.get(configurationFilename));
 		PBOrchestrator orchestrator = new PBOrchestrator(serviceManager.getServices());
 		orchestrator.sync();
-
 	}
 
 }
