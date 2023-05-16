@@ -77,23 +77,67 @@ public class DBSourceService extends PBSourceService {
 
 		}
 
+		private DataEntry nextEntry = null;
+
 		@Override
 		public boolean hasNext() {
 			boolean hasNext = false;
-			try {
-				hasNext = rs.next();
-				if (hasNext) {
-					Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
-					for (String dbColumn : dbColumns) {
-						entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
+			if (isLineAlreadyFetchedFromDB()) {
+				currentEntry = nextEntry;
+				nextEntry = null;
+				hasNext = true;
+			} else {
+				try {
+					hasNext = rs.next();
+					if (hasNext) {
+						currentEntry = new DataEntry(rs.getString(config.getUid()), createLdapEntryFrom(rs),
+								rs.getString(DBDialectHelper.PADL_HASH_COLUMN_NAME));
 					}
-					entry.addAttribute("objectClass", config.getObjectClasses());
-					currentEntry = new DataEntry(entry, rs.getString(DBDialectHelper.PADL_HASH_COLUMN_NAME));
+				} catch (SQLException e) {
+					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
 				}
-			} catch (SQLException e) {
-				logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
 			}
+
+			if (hasNext && didConfigHasMultiValuedAttributes()) {
+				try {
+					while (rs.next()) {
+						if (isNextLineFromSourceAnotherEntry(rs)) {
+							nextEntry = new DataEntry(rs.getString(config.getUid()), createLdapEntryFrom(rs),
+									rs.getString(DBDialectHelper.PADL_HASH_COLUMN_NAME));
+							break;
+						} else {
+							for (String multiValuedAttributeName : config.getMultiValueAttributes()) {
+								currentEntry.getEntry().addAttribute(multiValuedAttributeName,
+										rs.getString(config.getDBAttributeNameFor(multiValuedAttributeName)));
+							}
+						}
+					}
+				} catch (SQLException e) {
+					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
+				}
+			}
+
 			return hasNext;
+		}
+
+		private boolean didConfigHasMultiValuedAttributes() {
+			return config.getMultiValueAttributes().size() > 0;
+		}
+
+		private boolean isLineAlreadyFetchedFromDB() {
+			return nextEntry != null;
+		}
+		public boolean isNextLineFromSourceAnotherEntry(ResultSet rs) throws SQLException {
+			return ! currentEntry.getUid().equals(rs.getString(rs.getString(config.getUid())));
+		}
+		
+		private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
+			Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
+			for (String dbColumn : dbColumns) {
+				entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
+			}
+			entry.addAttribute("objectClass", config.getObjectClasses());
+			return entry;
 		}
 
 		@Override
@@ -108,5 +152,7 @@ public class DBSourceService extends PBSourceService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }

@@ -5,14 +5,15 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringTokenizer;
 
 import com.alefzero.padlbridge.config.model.SourceConfig;
 
 public class DBSourceConfig extends SourceConfig {
 
-	private Map<String, String> dbColToLDAP = new HashMap<String, String>();
+	private Map<String, String> dbColToLDAP = null;
+	private Map<String, String> ldapColToDB = null;
+
 	private Deque<String> objectClassesAsAttributes = new ArrayDeque<String>();
 	private String jdbcURL;
 	private String username;
@@ -69,11 +70,16 @@ public class DBSourceConfig extends SourceConfig {
 	}
 
 	public void setDatamap(Deque<String> datamap) {
+
+		dbColToLDAP = new HashMap<String, String>();
+		ldapColToDB = new HashMap<String, String>();
+
 		for (String item : datamap) {
 			StringTokenizer stEqual = new StringTokenizer(item, "=");
 			String dbCol = stEqual.nextToken().trim();
 			String ldapCol = stEqual.countTokens() == 0 ? dbCol : stEqual.nextToken().trim();
 			dbColToLDAP.put(dbCol, ldapCol);
+			ldapColToDB.put(ldapCol, dbCol);
 		}
 		this.datamap = datamap;
 	}
@@ -113,7 +119,11 @@ public class DBSourceConfig extends SourceConfig {
 	}
 
 	public String getLdapAttributeNameFor(String dbColumn) {
-		return Objects.requireNonNull(dbColToLDAP.get(dbColumn));
+		return dbColToLDAP.get(dbColumn);
+	}
+
+	public String getDBAttributeNameFor(String ldapColumn) {
+		return ldapColToDB.get(ldapColumn);
 	}
 
 	public Deque<String> getAllObjectClasses() {
