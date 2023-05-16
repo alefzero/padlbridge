@@ -15,4 +15,14 @@ public abstract class PBSourceService extends PBGenericService<SourceConfig> {
 
 	public abstract Iterator<DataEntry> getAllEntries();
 
+	public abstract Iterator<String> getAllUids();
+
+	/**
+	 * Shorthand for {@link #getConfig()#getName()}
+	 * @return
+	 */
+	public String getName() {
+		return this.getConfig().getName();
+	}
+
 }

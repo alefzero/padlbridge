@@ -1,7 +1,5 @@
 package com.alefzero.padlbridge.orchestrator;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,36 +21,17 @@ public class PBOrchestrator {
 	private PBCacheService cache;
 	private PBTargetService target;
 	private List<PBSourceService> sources;
-	private List<PBSourceService> sourcesInReverseOrder;
 
 	public PBOrchestrator(PBLoadedServices services) {
 		super();
 		cache = services.getCache();
 		target = services.getTarget();
 		sources = services.getSources();
-		sourcesInReverseOrder = new ArrayList<PBSourceService>(sources);
-		Collections.reverse(sourcesInReverseOrder);
+		
 	}
 
 	public void sync() {
 		logger.trace(".sync");
-
-		cache.prepare();
-		sources.forEach(source -> {
-			cache.addHashesFrom(source);
-		});
-
-		cache.consolidate();
-
-		sourcesInReverseOrder.forEach(source -> {
-			target.deleteAll(cache.getDeletedEntriesFrom(source));
-		});
-
-		sources.forEach(source -> {
-			//target.addAll(cache.getEntriesToAddOrModify(source));
-		});
-
-		cache.updateTables();
-
+		cache.sync(target, sources);
 	}
 }

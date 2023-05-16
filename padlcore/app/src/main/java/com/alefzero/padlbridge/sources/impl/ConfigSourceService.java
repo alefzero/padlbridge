@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import com.alefzero.padlbridge.core.model.DataEntry;
 import com.alefzero.padlbridge.sources.PBSourceService;
-import com.unboundid.ldap.sdk.Entry;
 
 public class ConfigSourceService extends PBSourceService {
 	
@@ -23,6 +22,12 @@ public class ConfigSourceService extends PBSourceService {
 	public void prepare() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Iterator<String> getAllUids() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -88,7 +88,7 @@ public class DBSourceService extends PBSourceService {
 						entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
 					}
 					entry.addAttribute("objectClass", config.getObjectClasses());
-					currentEntry = new DataEntry(entry, rs.getString(helper.PADL_HASH_COLUMN_NAME));
+					currentEntry = new DataEntry(entry, rs.getString(DBDialectHelper.PADL_HASH_COLUMN_NAME));
 				}
 			} catch (SQLException e) {
 				logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
@@ -101,6 +101,12 @@ public class DBSourceService extends PBSourceService {
 			return currentEntry;
 		}
 
+	}
+
+	@Override
+	public Iterator<String> getAllUids() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

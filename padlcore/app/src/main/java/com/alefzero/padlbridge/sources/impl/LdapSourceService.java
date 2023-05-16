@@ -24,4 +24,10 @@ public class LdapSourceService extends PBSourceService {
 		
 	}
 
+	@Override
+	public Iterator<String> getAllUids() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
