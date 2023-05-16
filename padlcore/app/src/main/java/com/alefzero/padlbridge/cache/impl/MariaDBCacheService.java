@@ -364,7 +364,7 @@ public class MariaDBCacheService extends PBCacheService {
 			try {
 				_return = rs.next();
 				if (_return) {
-					current = new DataEntry(new Entry("dn: " + rs.getString(1), "objectClass: inetOrgPerson",
+					current = new DataEntry(rs.getString(2), new Entry("dn: " + rs.getString(1), "objectClass: inetOrgPerson",
 							"cn: Sir " + rs.getString(2), "sn: SN " + rs.getString(2), "uid: " + rs.getString(2)),
 							rs.getString(3));
 				}
