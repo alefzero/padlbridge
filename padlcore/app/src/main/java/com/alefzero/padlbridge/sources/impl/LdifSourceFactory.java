@@ -6,7 +6,7 @@ public class LdifSourceFactory extends PBSourceFactory {
 
 	@Override
 	public String getServiceType() {
-		return "config";
+		return "ldif";
 	}
 
 	@SuppressWarnings("unchecked")

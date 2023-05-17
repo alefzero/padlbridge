@@ -71,7 +71,7 @@ public class MariaDBCacheService extends PBCacheService {
 				and dn = ?""";
 
 	private static final String SQL_SELECT_GET_HASH_FROM_CACHE = """
-			select hash
+			select current_hash
 			from current_cache
 			where
 				source_name = ?
@@ -79,14 +79,14 @@ public class MariaDBCacheService extends PBCacheService {
 
 	private static final String SQL_UPDATE_HASH_VALUE_OF = """
 			update current_cache
-			set hash = ?
+			set current_hash = ?
 			where
 				source_name = ?
 				and uid = ?""";
 
 	private static final String SQL_INSERT_ENTRY_TO_CACHE = """
 			insert into current_cache
-			( source_name, uid, dn, hash, status_flag )
+			( source_name, uid, dn, current_hash, status_flag )
 			values ( ?, ?, ?, ?, 0 )""";
 
 	private MariaDBCacheConfig config = null;
@@ -169,8 +169,8 @@ public class MariaDBCacheService extends PBCacheService {
 
 			PreparedStatement psCheckAsToDelete = conn.prepareStatement(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE);
 			psCheckAsToDelete.setInt(1, CACHED_ENTRY_STATUS_DELETE);
-			psCheckAsToDelete.setInt(2, CACHED_ENTRY_STATUS_UNSET);
 			psCheckAsToDelete.setString(2, sourceName);
+			psCheckAsToDelete.setInt(3, CACHED_ENTRY_STATUS_UNSET);
 			psCheckAsToDelete.executeUpdate();
 			psCheckAsToDelete.close();
 
@@ -256,13 +256,16 @@ public class MariaDBCacheService extends PBCacheService {
 
 	@Override
 	public void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn, String hash) {
-		logger.trace(".updateCacheWithData ");
+		logger.trace(
+				".updateCacheWithData int cacheOperationValue={}, String sourceName={}, String uid={}, String dn={}, String hash={}",
+				cacheOperationValue, sourceName, uid, dn, hash);
 		try (Connection conn = bds.getConnection()) {
 			if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_UPDATE) {
 				PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_HASH_VALUE_OF);
 				ps.setString(1, Objects.requireNonNull(hash));
 				ps.setString(2, Objects.requireNonNull(sourceName));
 				ps.setString(3, Objects.requireNonNull(uid));
+				ps.executeUpdate();
 				ps.close();
 			} else if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_ADD) {
 				PreparedStatement ps = conn.prepareStatement(SQL_INSERT_ENTRY_TO_CACHE);
@@ -270,6 +273,7 @@ public class MariaDBCacheService extends PBCacheService {
 				ps.setString(2, Objects.requireNonNull(uid));
 				ps.setString(3, Objects.requireNonNull(dn));
 				ps.setString(4, Objects.requireNonNull(hash));
+				ps.executeUpdate();
 				ps.close();
 			}
 		} catch (SQLException e) {

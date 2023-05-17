@@ -54,10 +54,15 @@ public class PBOrchestrator {
 						dataEntry.getHash());
 				if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
 					target.add(dataEntry.getEntry());
+					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
+							dataEntry.getEntry().getDN(), dataEntry.getHash());
 				} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation) {
 					target.modify(dataEntry.getEntry());
-				} else { 
-					logger.error("Error processing data: operation {} for DN: {}", operation, dataEntry.getEntry().getDN());
+					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
+							dataEntry.getEntry().getDN(), dataEntry.getHash());
+				} else {
+					logger.error("Error processing data: operation {} for DN: {}", operation,
+							dataEntry.getEntry().getDN());
 				}
 			});
 		});
