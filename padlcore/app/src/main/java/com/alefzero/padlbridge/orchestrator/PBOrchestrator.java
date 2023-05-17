@@ -56,12 +56,13 @@ public class PBOrchestrator {
 						dataEntry.getHash());
 				if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
 					// DO NOTHING
-				} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
-					target.add(dataEntry.getEntry());
+				} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation
+						|| "update".equalsIgnoreCase(source.getConfig().getDefaultOperation())) {
+					target.modify(dataEntry.getEntry());
 					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
 							dataEntry.getEntry().getDN(), dataEntry.getHash());
-				} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation) {
-					target.modify(dataEntry.getEntry());
+				} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
+					target.add(dataEntry.getEntry());
 					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
 							dataEntry.getEntry().getDN(), dataEntry.getHash());
 				} else {

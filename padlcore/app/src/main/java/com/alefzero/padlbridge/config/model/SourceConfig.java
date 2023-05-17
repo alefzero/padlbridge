@@ -5,6 +5,7 @@ public class SourceConfig implements PBGenericConfig {
 	private String type;
 	private String name;
 	private String dn;
+	private String defaultOperation;
 
 	public String getType() {
 		return type;
@@ -30,9 +31,18 @@ public class SourceConfig implements PBGenericConfig {
 		this.dn = dn;
 	}
 
+	public String getDefaultOperation() {
+		return defaultOperation;
+	}
+
+	public void setDefaultOperation(String defaultOperation) {
+		this.defaultOperation = defaultOperation;
+	}
+
 	@Override
 	public String toString() {
-		return "SourceConfig [type=" + type + ", name=" + name + ", dn=" + dn + "]";
+		return "SourceConfig [type=" + type + ", name=" + name + ", dn=" + dn + ", defaultOperation=" + defaultOperation
+				+ "]";
 	}
 
 }
