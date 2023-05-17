@@ -1,13 +1,10 @@
 package com.alefzero.padlbridge.sources.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayDeque;
-import java.util.Base64.Decoder;
-
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.util.Deque;
 import java.util.Iterator;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import com.alefzero.padlbridge.core.model.DataEntry;
 import com.alefzero.padlbridge.exceptions.PadlUnrecoverableError;
