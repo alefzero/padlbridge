@@ -23,14 +23,14 @@ check_config_file() {
     then
         echo "Variable PADL_CONFIG_FILE is not set."
     else
-        CONFIG_FILE="${PADL_CONFIG_FILE}"
-        echo "Using configuration file provided by PADL_CONFIG_FILE variable."
+        CONFIG_FILE="padlcore"
+        echo "Trying to default configuration file provided by PADL_CONFIG_FILE (${PADL_CONFIG_FILE}) variable."
     fi
 
     if [ -z ${CONFIG_FILE} ]
     then
         CONFIG_FILE="${PADLBRIDGE_HOME}/conf/padlbridge.yaml"
-        echo "No configuration file specified. Using configuration file default location."
+        echo "No configuration file specified. Trying to use configuration file at default location (${CONFIG_FILE})."
     else 
         echo "Configuration file parameter provided."
     fi
@@ -44,9 +44,11 @@ run_padl_action() {
 check_config_file
 echo "Using configuration file located at ${CONFIG_FILE}."
 while $PADL_RUN_FLAG
+do
     run_padl_action run
     sleep $UPDATE_DELAY_SECS &
     SLEEP_PID=$$
     wait $SLEEP_PID
     SLEEP_PID=
 done
+
