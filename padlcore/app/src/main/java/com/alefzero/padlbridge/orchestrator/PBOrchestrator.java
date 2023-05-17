@@ -52,7 +52,9 @@ public class PBOrchestrator {
 			source.getAllEntries().forEachRemaining(dataEntry -> {
 				int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
 						dataEntry.getHash());
-				if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
+				if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
+					// DO NOTHING
+				} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
 					target.add(dataEntry.getEntry());
 					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
 							dataEntry.getEntry().getDN(), dataEntry.getHash());

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import com.alefzero.padlbridge.config.model.SourceConfig;
@@ -21,7 +22,7 @@ public class DBSourceConfig extends SourceConfig {
 	private String query;
 	private String uid;
 	private Deque<String> datamap;
-	private Deque<String> multiValueAttributes;
+	private Deque<String> multiValueAttributes = new ArrayDeque<String>();
 	private Deque<String> objectClasses;
 	private String dialectHelperClass = "com.alefzero.padlbridge.sources.dialects.MariaDBDialectHelper";
 
@@ -76,8 +77,8 @@ public class DBSourceConfig extends SourceConfig {
 
 		for (String item : datamap) {
 			StringTokenizer stEqual = new StringTokenizer(item, "=");
-			String dbCol = stEqual.nextToken().trim();
-			String ldapCol = stEqual.countTokens() == 0 ? dbCol : stEqual.nextToken().trim();
+			String ldapCol = stEqual.nextToken().trim();
+			String dbCol = stEqual.countTokens() == 0 ? ldapCol : stEqual.nextToken().trim();
 			dbColToLDAP.put(dbCol, ldapCol);
 			ldapColToDB.put(ldapCol, dbCol);
 		}
@@ -119,11 +120,13 @@ public class DBSourceConfig extends SourceConfig {
 	}
 
 	public String getLdapAttributeNameFor(String dbColumn) {
-		return dbColToLDAP.get(dbColumn);
+		return Objects.requireNonNull(dbColToLDAP.get(dbColumn),
+				"Database column " + dbColumn + " not found in dataMap. Check your configuration");
 	}
 
 	public String getDBAttributeNameFor(String ldapColumn) {
-		return ldapColToDB.get(ldapColumn);
+		return Objects.requireNonNull(ldapColToDB.get(ldapColumn),
+				"Ldap column " + ldapColumn + " not found in dataMap. Check your configuration");
 	}
 
 	public Deque<String> getAllObjectClasses() {

@@ -12,6 +12,7 @@ public abstract class DBDialectHelper {
 
 	public static final String PADL_HASH_COLUMN_NAME = "padl_hash_id";
 	private static final String PADL_HASH_SQL_FORMAT = "select %s %s, a.* from (%s) a order by %s";
+	private static final String PADL_UID_SQL_FORMAT = "select %s from (%s) a order by %s";
 
 	private String sqlText;
 	private String uidField;
@@ -57,5 +58,9 @@ public abstract class DBDialectHelper {
 	protected abstract String getHashFunctionFormat(Deque<String> columns);
 
 	protected abstract String getOneLineQueryFormat(String sqlText);
+
+	public String getSQLForAllUids() {
+		return String.format(PADL_UID_SQL_FORMAT, uidField, sqlText, uidField);
+	}
 
 }

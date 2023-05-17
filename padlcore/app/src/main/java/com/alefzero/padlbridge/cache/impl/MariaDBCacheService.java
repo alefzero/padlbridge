@@ -229,7 +229,6 @@ public class MariaDBCacheService extends PBCacheService {
 
 	@Override
 	public int getExpectedOperationFor(String sourceName, String uid, String hash) {
-		logger.trace(".getExpectedOperationFor ");
 		int _return = 0;
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(SQL_SELECT_GET_HASH_FROM_CACHE);

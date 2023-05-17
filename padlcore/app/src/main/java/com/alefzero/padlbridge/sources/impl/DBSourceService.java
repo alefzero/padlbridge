@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
@@ -40,9 +41,12 @@ public class DBSourceService extends PBSourceService {
 
 			helper.prepare(conn, config.getQuery(), config.getUid());
 
-		} catch (SQLException | InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			logger.error("Dialect class not found: {}", config.getDialectHelperClass());
+			throw new PadlUnrecoverableError(e);
+		} catch (SQLException e) {
+			logger.error("Problem processing query SQL={}. Check your configuration.", config.getQuery());
 			throw new PadlUnrecoverableError(e);
 		}
 	}
@@ -127,10 +131,11 @@ public class DBSourceService extends PBSourceService {
 		private boolean isLineAlreadyFetchedFromDB() {
 			return nextEntry != null;
 		}
+
 		public boolean isNextLineFromSourceAnotherEntry(ResultSet rs) throws SQLException {
-			return ! currentEntry.getUid().equals(rs.getString(rs.getString(config.getUid())));
+			return !currentEntry.getUid().equals(rs.getString(rs.getString(config.getUid())));
 		}
-		
+
 		private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
 			Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
 			for (String dbColumn : dbColumns) {
@@ -149,10 +154,20 @@ public class DBSourceService extends PBSourceService {
 
 	@Override
 	public Iterator<String> getAllUids() {
-		// TODO Auto-generated method stub
-		return null;
+		Deque<String> uids = new ArrayDeque<String>();
+		try (Connection conn = bds.getConnection()) {
+			PreparedStatement ps = conn.prepareStatement(helper.getSQLForAllUids());
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				uids.add(rs.getString(1));
+			}
+			rs.close();
+			ps.close();
+		} catch (SQLException e) {
+			// TODO Throw correct exception
+			e.printStackTrace();
+		}
+		return uids.iterator();
 	}
-
-
 
 }
