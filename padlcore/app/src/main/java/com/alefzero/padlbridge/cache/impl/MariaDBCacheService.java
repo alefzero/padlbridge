@@ -99,10 +99,8 @@ public class MariaDBCacheService extends PBCacheService {
 	@Override
 	public void prepare() {
 		logger.trace(".prepare");
-
 		initializeResources();
 		cleanCacheTablesState();
-
 	}
 
 	private void initializeResources() {
@@ -146,7 +144,7 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	protected void setEntryUidAsFoundFor(String sourceName, Iterator<String> allDistinctUids) {
+	public void syncUidsFromSource(String sourceName, Iterator<String> allDistinctUids) {
 		logger.trace(".setEntryUidAsFoundFor ");
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement psCheckAsFound = conn.prepareStatement(SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID);
@@ -183,7 +181,7 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	protected Iterator<String> getDeletedUidsFrom(String sourceName) {
+	public Iterator<String> getAllDNsToBeDeletedFromSource(String sourceName) {
 		logger.trace(".getDeletedUidsFrom ");
 		Deque<String> uids = new ArrayDeque<String>();
 		try (Connection conn = bds.getConnection()) {
@@ -204,13 +202,24 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	protected void removeDNFromCache(String sourceName, String dn) {
+	public void removeFromCacheByDN(String sourceName, Deque<String> dnItems) {
 		logger.trace(".removeDNFromCache ");
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(SQL_DELETE_DN_FROM_SOURCE);
-			ps.setString(1, sourceName);
-			ps.setString(2, dn);
-			ps.executeUpdate();
+			Iterator<String> iterator = dnItems.iterator();
+			int count = 0;
+			while (iterator.hasNext()) {
+				ps.setString(1, sourceName);
+				ps.setString(2, iterator.next());
+				ps.addBatch();
+				if (++count > BATCH_COUNT) {
+					ps.executeBatch();
+					count = 0;
+				}
+			}
+			if (count > 0) {
+				ps.executeBatch();
+			}
 			ps.close();
 		} catch (SQLException e) {
 			// TODO throw an unchecked recoverable exception or unrecoverable error
@@ -219,7 +228,7 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	protected int getExpectedOperationFor(String sourceName, String uid, String hash) {
+	public int getExpectedOperationFor(String sourceName, String uid, String hash) {
 		logger.trace(".getExpectedOperationFor ");
 		int _return = 0;
 		try (Connection conn = bds.getConnection()) {
@@ -246,7 +255,7 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	protected void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn, String hash) {
+	public void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn, String hash) {
 		logger.trace(".updateCacheWithData ");
 		try (Connection conn = bds.getConnection()) {
 			if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_UPDATE) {
@@ -364,8 +373,10 @@ public class MariaDBCacheService extends PBCacheService {
 			try {
 				_return = rs.next();
 				if (_return) {
-					current = new DataEntry(rs.getString(2), new Entry("dn: " + rs.getString(1), "objectClass: inetOrgPerson",
-							"cn: Sir " + rs.getString(2), "sn: SN " + rs.getString(2), "uid: " + rs.getString(2)),
+					current = new DataEntry(rs.getString(2),
+							new Entry("dn: " + rs.getString(1), "objectClass: inetOrgPerson",
+									"cn: Sir " + rs.getString(2), "sn: SN " + rs.getString(2),
+									"uid: " + rs.getString(2)),
 							rs.getString(3));
 				}
 			} catch (SQLException | LDIFException e) {

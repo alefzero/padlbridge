@@ -1,5 +1,6 @@
 package com.alefzero.padlbridge.targets;
 
+import java.util.Deque;
 import java.util.Iterator;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,10 +20,14 @@ public abstract class PBTargetService extends PBGenericService<TargetConfig> {
 	
 	protected static final Logger logger = LogManager.getLogger();
 
-	public abstract void deleteAll(Iterator<String> listOfDeletedDN);
+	public abstract Deque<String> deleteAll(Iterator<String> listOfDeletedDN);
 
 	public abstract void addAll(Iterator<Entry> entriesToAddFrom);
 
-	public abstract void modifyAll(Iterator<Entry> entriesToModifyFrom);
+	public abstract void add(Entry entry);
+
+	public abstract void modify(Entry entry);
+	
+	public abstract void delete(Entry delete);
 
 }

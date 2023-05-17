@@ -6,7 +6,7 @@ import java.util.Iterator;
 import com.alefzero.padlbridge.core.model.DataEntry;
 import com.alefzero.padlbridge.sources.PBSourceService;
 
-public class ConfigSourceService extends PBSourceService {
+public class LdifSourceService extends PBSourceService {
 	
 	@Override
 	public String toString() {

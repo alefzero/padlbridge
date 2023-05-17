@@ -2,7 +2,7 @@ package com.alefzero.padlbridge.sources.impl;
 
 import com.alefzero.padlbridge.sources.PBSourceFactory;
 
-public class ConfigSourceFactory extends PBSourceFactory {
+public class LdifSourceFactory extends PBSourceFactory {
 
 	@Override
 	public String getServiceType() {
@@ -11,14 +11,14 @@ public class ConfigSourceFactory extends PBSourceFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ConfigSourceService getInstance() {
-		return new ConfigSourceService();
+	public LdifSourceService getInstance() {
+		return new LdifSourceService();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Class<ConfigSourceConfig> getConfigClass() {
-		return ConfigSourceConfig.class;
+	public Class<LdifSourceConfig> getConfigClass() {
+		return LdifSourceConfig.class;
 	}
 
 }
