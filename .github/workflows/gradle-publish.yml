@@ -32,8 +32,8 @@ jobs:
 
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      gradle-version: 8.0.2
       with:
+        gradle-version: 8.0.2
         arguments: build
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
