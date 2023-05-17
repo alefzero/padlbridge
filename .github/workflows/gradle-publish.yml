@@ -35,6 +35,7 @@ jobs:
       with:
         gradle-version: 8.0.2
         arguments: build
+        build-root-directory: padlcore
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
