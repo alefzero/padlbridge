@@ -9,11 +9,7 @@ trap end_padl_app INT TERM
 
 end_padl_app() {
     echo "Ending padlbridge app..."
-    PADL_RUN_FLAG=false
-    if [ ! -z $SLEEP_PID ]
-    then
-        kill $SLEEP_PID
-    fi
+    kill $PADL_PID
 }
 
 check_config_file() {
@@ -36,19 +32,13 @@ check_config_file() {
     fi
 
 }
-run_padl_action() {
-    local action=$1
-    ${PADLBRIDGE_HOME}/core/bin/core $action ${CONFIG_FILE} 2>&1 1> >(tee) 
-}
 
 check_config_file
 echo "Using configuration file located at ${CONFIG_FILE}."
 while $PADL_RUN_FLAG
 do
-    run_padl_action run
-    sleep $UPDATE_DELAY_SECS &
-    SLEEP_PID=$$
-    wait $SLEEP_PID
-    SLEEP_PID=
+    nohup ${PADLBRIDGE_HOME}/core/bin/core run ${CONFIG_FILE} 2>&1 1> >(tee) &
+    PADL_PID=$$
+    wait $PADL_PID
 done
 
