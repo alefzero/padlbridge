@@ -22,4 +22,3 @@ ENTRYPOINT [ "/bin/bash", "-c" ]
 CMD [ "${PADLBRIDGE_HOME}/padlbridge.sh", "run" ]
 
 
-
