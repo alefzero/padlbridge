@@ -24,7 +24,7 @@ public class DBSourceConfig extends SourceConfig {
 	private Deque<String> datamap;
 	private Deque<String> multiValueAttributes = new ArrayDeque<String>();
 	private Deque<String> objectClasses;
-	private String dialectHelperClass = "com.alefzero.padlbridge.sources.dialects.MariaDBDialectHelper";
+	private String dialect = "com.alefzero.padlbridge.sources.dialects.MariaDBDialectHelper";
 
 	public String getJdbcURL() {
 		return jdbcURL;
@@ -104,19 +104,19 @@ public class DBSourceConfig extends SourceConfig {
 		this.objectClasses = objectClasses;
 	}
 
-	public String getDialectHelperClass() {
-		return dialectHelperClass;
+	public String getDialect() {
+		return dialect;
 	}
 
-	public void setDialectHelperClass(String dialectHelperClass) {
-		this.dialectHelperClass = dialectHelperClass;
+	public void setDialect(String dialectHelperClass) {
+		this.dialect = dialectHelperClass;
 	}
 
 	@Override
 	public String toString() {
 		return "DBSourceConfig [jdbcURL=" + jdbcURL + ", username=" + username + ", password=" + password + ", query="
 				+ query + ", uid=" + uid + ", datamap=" + datamap + ", multiValueAttributes=" + multiValueAttributes
-				+ ", objectClasses=" + objectClasses + ", dialectHelperClass=" + dialectHelperClass + "]";
+				+ ", objectClasses=" + objectClasses + ", dialectHelperClass=" + dialect + "]";
 	}
 
 	public String getLdapAttributeNameFor(String dbColumn) {

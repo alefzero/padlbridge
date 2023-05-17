@@ -36,14 +36,14 @@ public class DBSourceService extends PBSourceService {
 			bds.setCacheState(false);
 		}
 		try (Connection conn = bds.getConnection()) {
-			helper = (DBDialectHelper) Class.forName(config.getDialectHelperClass()).getDeclaredConstructor()
+			helper = (DBDialectHelper) Class.forName(config.getDialect()).getDeclaredConstructor()
 					.newInstance();
 
 			helper.prepare(conn, config.getQuery(), config.getUid());
 
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
-			logger.error("Dialect class not found: {}", config.getDialectHelperClass());
+			logger.error("Dialect class not found: {}", config.getDialect());
 			throw new PadlUnrecoverableError(e);
 		} catch (SQLException e) {
 			logger.error("Problem processing query SQL={}. Check your configuration.", config.getQuery());
