@@ -16,8 +16,8 @@ uid: user1
 
 dn: uid=user2,ou=users,dc=alefzero,dc=com
 objectClass: inetOrgPerson
-cn: User One
-sn: One
-uid: user1
+cn: User Two
+sn: Two
+uid: user2
 
 

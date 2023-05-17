@@ -36,7 +36,7 @@ public class LdapSourceService extends PBSourceService {
 	@Override
 	public Iterator<DataEntry> getAllEntries() {
 		try (LDAPConnection conn = pool.getConnection()) {
-			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUBORDINATE_SUBTREE, "(objectClass=*)",
+			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUB, "(objectClass=*)",
 					"*");
 			return new EntryIterator(result);
 		} catch (LDAPException e) {
@@ -49,7 +49,7 @@ public class LdapSourceService extends PBSourceService {
 	public Iterator<String> getAllUids() {
 		Deque<String> dnItems = new ArrayDeque<String>();
 		try (LDAPConnection conn = pool.getConnection()) {
-			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUBORDINATE_SUBTREE, "(objectClass=*)",
+			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUB, "(objectClass=*)",
 					"dn");
 			result.getSearchEntries().forEach(entry -> {
 				dnItems.add(entry.getDN());

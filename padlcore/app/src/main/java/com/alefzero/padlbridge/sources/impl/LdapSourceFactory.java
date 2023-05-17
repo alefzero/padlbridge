@@ -11,8 +11,8 @@ public class LdapSourceFactory extends PBSourceFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public LdifSourceService getInstance() {
-		return new LdifSourceService();
+	public LdapSourceService getInstance() {
+		return new LdapSourceService();
 	}
 
 	@SuppressWarnings("unchecked")

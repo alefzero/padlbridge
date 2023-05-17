@@ -69,6 +69,7 @@ public class DBSourceService extends PBSourceService {
 		private Deque<String> dbColumns;
 
 		private EntryIterator(Connection conn, Deque<String> dbColumns) throws SQLException {
+			// TODO: change to LDAP columns so datamap can map to more than 1 column
 			this.conn = conn;
 			this.dbColumns = dbColumns;
 			prepareIterator();
@@ -98,6 +99,7 @@ public class DBSourceService extends PBSourceService {
 								rs.getString(DBDialectHelper.PADL_HASH_COLUMN_NAME));
 					}
 				} catch (SQLException e) {
+					e.printStackTrace();
 					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
 				}
 			}
@@ -117,6 +119,7 @@ public class DBSourceService extends PBSourceService {
 						}
 					}
 				} catch (SQLException e) {
+					e.printStackTrace();
 					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
 				}
 			}
@@ -133,7 +136,7 @@ public class DBSourceService extends PBSourceService {
 		}
 
 		public boolean isNextLineFromSourceAnotherEntry(ResultSet rs) throws SQLException {
-			return !currentEntry.getUid().equals(rs.getString(rs.getString(config.getUid())));
+			return !currentEntry.getUid().equals(rs.getString(config.getUid()));
 		}
 
 		private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {

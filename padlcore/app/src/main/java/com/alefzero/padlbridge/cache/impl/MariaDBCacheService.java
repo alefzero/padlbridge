@@ -182,7 +182,7 @@ public class MariaDBCacheService extends PBCacheService {
 
 	@Override
 	public Iterator<String> getAllDNsToBeDeletedFromSource(String sourceName) {
-		logger.trace(".getDeletedUidsFrom ");
+		logger.trace(".getDeletedUidsFrom [String sourceName={}]", sourceName);
 		Deque<String> uids = new ArrayDeque<String>();
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(SQL_GET_ALL_DNs_BY_SOURCE_AND_STATUS);

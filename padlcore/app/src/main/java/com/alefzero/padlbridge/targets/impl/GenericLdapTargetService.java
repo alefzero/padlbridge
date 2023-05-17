@@ -115,7 +115,12 @@ public class GenericLdapTargetService extends PBTargetService {
 					_return.add(item);
 
 				} catch (LDAPException e) {
-					if (e.getResultCode().intValue() == LDAPCodes.NO_SUCH_OBJECT) {
+					if (e.getResultCode().intValue() == LDAPCodes.NOT_ALLOWED_ON_NON_LEAF) {
+						e.printStackTrace();
+						logger.trace("deleting recursively for {}", item);
+						deleteTree(item);
+						_return.add(item);
+					} else if (e.getResultCode().intValue() == LDAPCodes.NO_SUCH_OBJECT) {
 						logger.error("dn {} does not exist at LDAP. Delete will be ignored.", item);
 					} else {
 						throw e;
@@ -123,6 +128,7 @@ public class GenericLdapTargetService extends PBTargetService {
 				}
 			}
 		} catch (LDAPException e) {
+			e.printStackTrace();
 			logger.error("Error processing target LDAP operation - dn {}. {}  {}", item, e.getResultString(),
 					e.getResultCode());
 		}
@@ -138,6 +144,7 @@ public class GenericLdapTargetService extends PBTargetService {
 					conn.delete(todel);
 				} catch (LDAPException e) {
 					if (e.getResultCode().intValue() == LDAPCodes.NOT_ALLOWED_ON_NON_LEAF) {
+						e.printStackTrace();
 						logger.trace("deleting recursively for {}", todel);
 						deleteTree(todel);
 					} else if (e.getResultCode().intValue() == LDAPCodes.NO_SUCH_OBJECT) {
