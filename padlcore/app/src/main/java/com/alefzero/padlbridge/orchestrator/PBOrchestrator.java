@@ -48,7 +48,9 @@ public class PBOrchestrator {
 		});
 
 		sources.forEach(source -> {
-			// maybe .parallelStream()
+// 			maybe
+//			Spliterator<DataEntry> split = Spliterators.spliteratorUnknownSize(source.getAllEntries(), 0);
+//			StreamSupport.stream(split, true).parallel().forEach(dataEntry -> {
 			source.getAllEntries().forEachRemaining(dataEntry -> {
 				int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
 						dataEntry.getHash());

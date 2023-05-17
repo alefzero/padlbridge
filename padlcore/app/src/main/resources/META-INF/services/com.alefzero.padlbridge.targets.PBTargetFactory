@@ -1,1 +1,2 @@
 com.alefzero.padlbridge.targets.impl.GenericLdapTargetFactory
+com.alefzero.padlbridge.targets.impl.DoNothingTargetFactory
