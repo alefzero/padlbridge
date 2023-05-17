@@ -26,7 +26,7 @@ check_config_file() {
     if [ -z ${CONFIG_FILE} ]
     then
         CONFIG_FILE="${PADLBRIDGE_HOME}/conf/padlbridge.yaml"
-        echo "No configuration file specified. Trying to use configuration file at default location (${CONFIG_FILE})."
+        echo "No configuration file specified. Trying to use configuration file at default location."
     else 
         echo "Configuration file parameter provided."
     fi
@@ -35,10 +35,8 @@ check_config_file() {
 
 check_config_file
 echo "Using configuration file located at ${CONFIG_FILE}."
-while $PADL_RUN_FLAG
-do
-    nohup ${PADLBRIDGE_HOME}/core/bin/core run ${CONFIG_FILE} 2>&1 1> >(tee) &
-    PADL_PID=$$
-    wait $PADL_PID
-done
+nohup ${PADLBRIDGE_HOME}/core/bin/core run ${CONFIG_FILE} 2>&1 1> >(tee) &
+PADL_PID=$$
+wait $PADL_PID
+
 
