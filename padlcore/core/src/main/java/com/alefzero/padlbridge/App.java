@@ -44,7 +44,7 @@ public class App {
 	public static String getConfigurationFilename(String[] args) {
 		logger.trace(".getConfigurationFilename [args: {}]", Arrays.toString(args));
 		String configurationFilename = args.length > 1 ? args[1] : "";
-		configurationFilename = configurationFilename.isEmpty() ? "./padlbridge.yaml" : configurationFilename;
+		configurationFilename = configurationFilename.isEmpty() ? "./conf/padlbridge.yaml" : configurationFilename;
 		logger.trace(".getConfigurationFilename [return: {}]", configurationFilename);
 		return configurationFilename;
 	}

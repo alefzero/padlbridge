@@ -35,8 +35,9 @@ check_config_file() {
 
 check_config_file
 echo "Using configuration file located at ${CONFIG_FILE}."
+cd ${PADLBRIDGE_HOME}
 nohup ${PADLBRIDGE_HOME}/core/bin/core run ${CONFIG_FILE} 2>&1 1> >(tee) &
-PADL_PID=$$
+PADL_PID=$!
 wait $PADL_PID
 
 
