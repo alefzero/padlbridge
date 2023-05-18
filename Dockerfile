@@ -4,7 +4,7 @@ WORKDIR padlbridge/padlcore
 RUN ./gradlew distTar
 RUN find /home/gradle -name "*.tar"
 
-FROM eclipse-temurin:17
+FROM eclipse-temurin:17-jre
 ENV PADLBRIDGE_HOME=/opt/padlbridge
 ENV PATH $PATH:${PADLBRIDGE_HOME}
 RUN groupadd padl; useradd -s /bin/bash -m -g padl -G users padl; mkdir -p ${PADLBRIDGE_HOME} ${PADLBRIDGE_LDAP_HOME} ${PADLBRIDGE_BIN_HOME}
