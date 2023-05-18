@@ -3,8 +3,10 @@ package com.alefzero.padlbridge.cache;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import com.alefzero.padlbridge.config.model.CacheConfig;
+import com.alefzero.padlbridge.exceptions.PadlRecoverableException;
 import com.alefzero.padlbridge.orchestrator.PBGenericService;
 import com.alefzero.padlbridge.targets.PBTargetService;
 
@@ -16,7 +18,37 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	public static final int CACHED_ENTRY_STATUS_ADD = 3;
 	public static final int CACHED_ENTRY_STATUS_UPDATE = 4;
 	public static final int CACHED_ENTRY_STATUS_DO_NOTHING = 5;
-	
+
+	private String instanceName = "default";
+
+	/**
+	 * Return the instance which this cache is used for. If no instance name is set,
+	 * the name "default" is used.
+	 * 
+	 * @return
+	 */
+	public String getInstanceName() {
+		return instanceName;
+	}
+
+	/**
+	 * Set the instance name this cache to use. If no instance name is set, the name
+	 * "default" is used. Only letters, numbers and _ symbol are allowed
+	 * 
+	 * @param instanceName
+	 */
+	public void setInstanceName(String instanceName) {
+		if (Objects.requireNonNull(instanceName).matches("[a-zA-Z0-9_]*") && instanceName.length() <= 30
+				&& !instanceName.isBlank()) {
+			this.instanceName = instanceName;
+		} else {
+			throw new PadlRecoverableException(String.format("""
+					Instance name should contain only letters, \
+					numbers and _ symbol and the length \
+					should be between 1 and 30 characters maximum.
+					instanceName = [%s] is invalid.""", instanceName));
+		}
+	}
 
 	/**
 	 * Set the cache service to initial state and prepare its resources for the next
@@ -26,7 +58,7 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * resources.
 	 */
 	public abstract void prepare();
-	
+
 	/**
 	 * Return a iterator of all DNs presents at the cache but not present in the
 	 * source.
@@ -44,7 +76,7 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * @param source
 	 * @param dn
 	 */
-	
+
 	public abstract void syncUidsFromSource(String sourceName, Iterator<String> allDistinctUids);
 
 	/**
@@ -81,6 +113,5 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 */
 	public abstract void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn,
 			String hash);
-
 
 }
