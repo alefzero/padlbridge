@@ -23,7 +23,7 @@ public class MariaDBCacheService extends PBCacheService {
 	protected static final Logger logger = LogManager.getLogger();
 
 	private static final String SQL_CREATE_CURRENT_CACHE_TABLE = """
-			create table if not exists current_cache
+			create table if not exists $INSTANCE_NAME$
 				(
 				source_name varchar(128),
 				uid varchar(128) not null,
@@ -34,22 +34,22 @@ public class MariaDBCacheService extends PBCacheService {
 				)""";
 
 	private static final String CREATE_CURRENT_CACHE_INDEX = """
-			create index if not exists current_cache_ndx
-			on current_cache (source_name, dn)""";
+			create index if not exists $INSTANCE_NAME$_ndx
+			on $INSTANCE_NAME$ (source_name, dn)""";
 
 	private static final String SQL_UPDATE_ALL_CACHE_STATUS_TO_UNSET = """
-			update current_cache
+			update $INSTANCE_NAME$
 			set status_flag = ?""";
 
 	private static final String SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID = """
-			update current_cache
+			update $INSTANCE_NAME$
 			set status_flag = ?
 			where
 			    source_name = ?
 				and uid = ?""";
 
 	private static final String SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE = """
-			update current_cache
+			update $INSTANCE_NAME$
 			set status_flag = ?
 			where
 			    source_name = ?
@@ -59,33 +59,33 @@ public class MariaDBCacheService extends PBCacheService {
 
 	private static final String SQL_GET_ALL_DNs_BY_SOURCE_AND_STATUS = """
 			select dn
-			from current_cache
+			from $INSTANCE_NAME$
 			where
 			   status_flag = ?
 			   and source_name = ?""";
 
 	private static final String SQL_DELETE_DN_FROM_SOURCE = """
-			delete from current_cache
+			delete from $INSTANCE_NAME$
 			where
 				source_name = ?
 				and dn = ?""";
 
 	private static final String SQL_SELECT_GET_HASH_FROM_CACHE = """
 			select current_hash
-			from current_cache
+			from $INSTANCE_NAME$
 			where
 				source_name = ?
 				and uid = ?""";
 
 	private static final String SQL_UPDATE_HASH_VALUE_OF = """
-			update current_cache
+			update $INSTANCE_NAME$
 			set current_hash = ?
 			where
 				source_name = ?
 				and uid = ?""";
 
 	private static final String SQL_INSERT_ENTRY_TO_CACHE = """
-			insert into current_cache
+			insert into $INSTANCE_NAME$
 			( source_name, uid, dn, current_hash, status_flag )
 			values ( ?, ?, ?, ?, 0 )""";
 
@@ -125,16 +125,20 @@ public class MariaDBCacheService extends PBCacheService {
 		}
 	}
 
+	public String formatSQL(String sqlCreateCurrentCacheTable) {
+		return sqlCreateCurrentCacheTable.replace("$INSTANCE_NAME$", "cache_data_" + getInstanceName());
+	}
+
 	private void createDBStructure(Connection conn) throws SQLException {
 		logger.trace(".createDBStructure ");
-		conn.prepareStatement(SQL_CREATE_CURRENT_CACHE_TABLE).execute();
-		conn.prepareStatement(CREATE_CURRENT_CACHE_INDEX).execute();
+		conn.prepareStatement(formatSQL(SQL_CREATE_CURRENT_CACHE_TABLE)).execute();
+		conn.prepareStatement(formatSQL(CREATE_CURRENT_CACHE_INDEX)).execute();
 	}
 
 	private void cleanCacheTablesState() {
 		logger.trace(".cleanCacheTablesState ");
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_ALL_CACHE_STATUS_TO_UNSET);
+			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_ALL_CACHE_STATUS_TO_UNSET));
 			ps.setInt(1, PBCacheService.CACHED_ENTRY_STATUS_UNSET);
 			ps.executeUpdate();
 		} catch (SQLException e) {
@@ -147,7 +151,7 @@ public class MariaDBCacheService extends PBCacheService {
 	public void syncUidsFromSource(String sourceName, Iterator<String> allDistinctUids) {
 		logger.trace(".setEntryUidAsFoundFor ");
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement psCheckAsFound = conn.prepareStatement(SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID);
+			PreparedStatement psCheckAsFound = conn.prepareStatement(formatSQL(SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID));
 			int batchCount = 0;
 			while (allDistinctUids.hasNext()) {
 				String uid = allDistinctUids.next();
@@ -167,7 +171,7 @@ public class MariaDBCacheService extends PBCacheService {
 			}
 			psCheckAsFound.close();
 
-			PreparedStatement psCheckAsToDelete = conn.prepareStatement(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE);
+			PreparedStatement psCheckAsToDelete = conn.prepareStatement(formatSQL(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE));
 			psCheckAsToDelete.setInt(1, CACHED_ENTRY_STATUS_DELETE);
 			psCheckAsToDelete.setString(2, sourceName);
 			psCheckAsToDelete.setInt(3, CACHED_ENTRY_STATUS_UNSET);
@@ -185,7 +189,7 @@ public class MariaDBCacheService extends PBCacheService {
 		logger.trace(".getDeletedUidsFrom [String sourceName={}]", sourceName);
 		Deque<String> uids = new ArrayDeque<String>();
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement ps = conn.prepareStatement(SQL_GET_ALL_DNs_BY_SOURCE_AND_STATUS);
+			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_GET_ALL_DNs_BY_SOURCE_AND_STATUS));
 			ps.setInt(1, CACHED_ENTRY_STATUS_DELETE);
 			ps.setString(2, sourceName);
 			ResultSet rs = ps.executeQuery();
@@ -365,7 +369,7 @@ public class MariaDBCacheService extends PBCacheService {
 
 		private void init() throws SQLException {
 			ps = conn.prepareStatement(
-					"select distinct dn, uid, hash from current_cache where config_id = ? and uid = ? order by 1,2");
+					"select distinct dn, uid, hash from $INSTANCE_NAME$ where config_id = ? and uid = ? order by 1,2");
 			ps.setString(1, "config1");
 			rs = ps.executeQuery();
 		}
