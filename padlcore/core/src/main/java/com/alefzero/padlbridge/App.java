@@ -3,6 +3,8 @@ package com.alefzero.padlbridge;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,9 +69,26 @@ public class App {
 
 	private void runSyncProcess(String configurationFilename) {
 		logger.trace(".runSyncProcess [configurationFilename: {}]", configurationFilename);
+
+		Thread shutdownListener = new Thread() {
+			public void run() {
+				logger.info("Shutdown requested. Waiting running process to end (max=10s).");
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					logger.trace("Error while ending runing process. Aborting.");
+				}
+			}
+		};
+
+		Runtime.getRuntime().addShutdownHook(shutdownListener);
+
 		PBServiceManager serviceManager = new PBServiceManager(Paths.get(configurationFilename));
 		PBOrchestrator orchestrator = new PBOrchestrator(serviceManager.getServices());
-		orchestrator.sync();
+
+		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> orchestrator.sync(), 0, 30,
+				TimeUnit.SECONDS);
+
 	}
 
 }
