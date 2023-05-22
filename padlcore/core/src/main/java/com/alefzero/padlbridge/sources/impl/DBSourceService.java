@@ -159,15 +159,19 @@ public class DBSourceService extends PBSourceService {
 		}
 
 		private boolean didConfigHasMultiValuedAttributes() {
+			logger.trace(".didConfigHasMultiValuedAttributes result: {}", config.getMultiValueAttributes().size() > 0 );
 			return config.getMultiValueAttributes().size() > 0;
 		}
 
 		private boolean isLineAlreadyFetchedFromDB() {
+			logger.trace(".isLineAlreadyFetchedFromDB result: {}", nextEntry != null);
 			return nextEntry != null;
 		}
 
 		public boolean isNextLineFromSourceAnotherEntry(ResultSet rs) throws SQLException {
-			return !currentEntry.getUid().equals(rs.getString(config.getUid()));
+			boolean _return = !currentEntry.getUid().equals(rs.getString(config.getUid()));
+			logger.trace(".isLineAlreadyFetchedFromDB result: {}", _return);
+			return _return ;
 		}
 
 		private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
