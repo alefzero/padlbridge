@@ -170,11 +170,12 @@ public class DBSourceService extends PBSourceService {
 
 		public boolean isNextLineFromSourceAnotherEntry(ResultSet rs) throws SQLException {
 			boolean _return = !currentEntry.getUid().equals(rs.getString(config.getUid()));
-			logger.trace(".isLineAlreadyFetchedFromDB result: {}", _return);
+			logger.trace(".isNextLineFromSourceAnotherEntry result: {}", _return);
 			return _return ;
 		}
 
 		private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
+			logger.trace(".createLdapEntryFrom");
 			Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
 			for (String dbColumn : dbColumns) {
 				entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
