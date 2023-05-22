@@ -130,6 +130,7 @@ public class PBServiceManager {
 			services = new PBLoadedServices(instanceConfig, cacheService, targetService, sourceServices);
 
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new PadlUnrecoverableError(e.getCause());
 		}
 
