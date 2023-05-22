@@ -81,7 +81,6 @@ public class DBSourceService extends PBSourceService {
 			String normalizedQuery = helper.getSQLWithHash();
 			this.ps = conn.prepareStatement(normalizedQuery);
 			this.rs = ps.executeQuery();
-
 		}
 
 		private DataEntry nextEntry = null;
