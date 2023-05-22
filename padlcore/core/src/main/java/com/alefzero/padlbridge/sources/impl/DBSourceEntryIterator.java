@@ -138,6 +138,7 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 		Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
 		logger.trace(".createLdapEntryFrom:entry");
 		for (String dbColumn : dbColumns) {
+			looger.trace(".createLdapEntryFrom:looking for collumn {}", dbColumn);
 			logger.trace(".createLdapEntryFrom:addAttribute {}, {}", config.getLdapAttributeNameFor(dbColumn),
 					rs.getString(dbColumn));
 			entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
