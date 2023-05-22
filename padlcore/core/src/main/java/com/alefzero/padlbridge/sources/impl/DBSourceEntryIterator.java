@@ -136,9 +136,13 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 	private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
 		logger.trace(".createLdapEntryFrom");
 		Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
+		logger.trace(".createLdapEntryFrom:entry");
 		for (String dbColumn : dbColumns) {
+			logger.trace(".createLdapEntryFrom:addAttribute {}, {}", config.getLdapAttributeNameFor(dbColumn),
+					rs.getString(dbColumn));
 			entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
 		}
+		logger.trace(".createLdapEntryFrom:objectClass {}", config.getObjectClasses());
 		entry.addAttribute("objectClass", config.getObjectClasses());
 		logger.trace(".createLdapEntryFrom result: {}", entry);
 		return entry;
