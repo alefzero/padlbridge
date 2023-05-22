@@ -58,6 +58,8 @@ public class DBSourceService extends PBSourceService {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new PadlUnrecoverableError(e);
+		} finally {
+			logger.trace(".getAllEntries returning EntryIterator of {}.", config.getName());
 		}
 	}
 

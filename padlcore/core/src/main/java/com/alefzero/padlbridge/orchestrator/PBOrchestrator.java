@@ -42,18 +42,18 @@ public class PBOrchestrator {
 		cache.prepare();
 
 		sourcesInReverseOrder.forEach(source -> {
-			logger.trace("Checking for removed items for source {}", source);
+			logger.trace("Checking for removed items for source {}", source.getName());
 			cache.syncUidsFromSource(source.getName(), source.getAllUids());
 			Deque<String> deletedDNs = target.deleteAll(cache.getAllDNsToBeDeletedFromSource(source.getName()));
 			cache.removeFromCacheByDN(source.getName(), deletedDNs);
 		});
 
 		sources.forEach(source -> {
+			logger.trace("Checking for items to add/modify at source {}", source.getName());
 // 			maybe
 //			Spliterator<DataEntry> split = Spliterators.spliteratorUnknownSize(source.getAllEntries(), 0);
 //			StreamSupport.stream(split, true).parallel().forEach(dataEntry -> {
 			source.getAllEntries().forEachRemaining(dataEntry -> {
-				logger.trace("Checking for items to add/modify at source {}", source);
 				int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
 						dataEntry.getHash());
 				if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
