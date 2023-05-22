@@ -52,7 +52,7 @@ public class DBSourceService extends PBSourceService {
 
 	@Override
 	public Iterator<DataEntry> getAllEntries() {
-		try (Connection conn = bds.getConnection()) {
+		try {
 			return new EntryIterator(helper.getDBColumnsOfAttributes());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -65,12 +65,13 @@ public class DBSourceService extends PBSourceService {
 	private class EntryIterator implements Iterator<DataEntry> {
 		private Connection conn;
 		private PreparedStatement ps;
-		private DataEntry currentEntry;
 		private ResultSet rs;
+		private DataEntry currentEntry;
 		private Deque<String> dbColumns;
 		private Long count = 0L;
 
 		private EntryIterator(Deque<String> dbColumns) throws SQLException {
+			logger.trace("Creating iterator for {}", config.getName());
 			// TODO: change to LDAP columns so datamap can map to more than 1 column
 			this.conn = bds.getConnection();
 			this.dbColumns = dbColumns;
@@ -78,6 +79,8 @@ public class DBSourceService extends PBSourceService {
 		}
 
 		private void prepareIterator() throws SQLException {
+			logger.trace(".prepareIterator - {}", config.getName());
+
 			String normalizedQuery = helper.getSQLWithHash();
 			this.ps = conn.prepareStatement(normalizedQuery);
 			this.rs = ps.executeQuery();
@@ -87,6 +90,7 @@ public class DBSourceService extends PBSourceService {
 
 		@Override
 		public boolean hasNext() {
+			logger.trace(".hasNext - {}", config.getName());
 			boolean hasNext = false;
 			if (isLineAlreadyFetchedFromDB()) {
 				currentEntry = nextEntry;
@@ -130,12 +134,13 @@ public class DBSourceService extends PBSourceService {
 				// time to say goodbye.
 				closeIteratorConnection();
 			}
-
+			logger.trace(".hasNext - return {}", hasNext);
 			return hasNext;
 		}
 
 		@Override
 		public DataEntry next() {
+			logger.trace(".next - {}", config.getName());
 			if (++count % 1000L == 0) {
 				logger.debug ("Processed {} items for this source.", count);
 			};
@@ -143,6 +148,8 @@ public class DBSourceService extends PBSourceService {
 		}
 
 		private void closeIteratorConnection() {
+			logger.trace(".closeIteratorConnection");
+
 			try {
 				conn.close();
 			} catch (SQLException e) {
@@ -175,6 +182,7 @@ public class DBSourceService extends PBSourceService {
 
 	@Override
 	public Iterator<String> getAllUids() {
+		logger.trace(".getAllUids");
 		Deque<String> uids = new ArrayDeque<String>();
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(helper.getSQLForAllUids());

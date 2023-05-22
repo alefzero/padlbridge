@@ -54,7 +54,6 @@ public class PBOrchestrator {
 //			Spliterator<DataEntry> split = Spliterators.spliteratorUnknownSize(source.getAllEntries(), 0);
 //			StreamSupport.stream(split, true).parallel().forEach(dataEntry -> {
 			source.getAllEntries().forEachRemaining(dataEntry -> {
-				logger.trace("Processing {}", dataEntry);
 				int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
 						dataEntry.getHash());
 				if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
