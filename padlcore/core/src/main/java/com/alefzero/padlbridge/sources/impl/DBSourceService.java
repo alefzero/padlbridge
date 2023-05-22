@@ -36,8 +36,7 @@ public class DBSourceService extends PBSourceService {
 			bds.setCacheState(false);
 		}
 		try (Connection conn = bds.getConnection()) {
-			helper = (DBDialectHelper) Class.forName(config.getDialect()).getDeclaredConstructor()
-					.newInstance();
+			helper = (DBDialectHelper) Class.forName(config.getDialect()).getDeclaredConstructor().newInstance();
 
 			helper.prepare(conn, config.getQuery(), config.getUid());
 
@@ -69,6 +68,7 @@ public class DBSourceService extends PBSourceService {
 		private DataEntry currentEntry;
 		private ResultSet rs;
 		private Deque<String> dbColumns;
+		private Long count = 0L;
 
 		private EntryIterator(Deque<String> dbColumns) throws SQLException {
 			// TODO: change to LDAP columns so datamap can map to more than 1 column
@@ -122,12 +122,12 @@ public class DBSourceService extends PBSourceService {
 						}
 					}
 				} catch (SQLException e) {
-					closeIteratorConnection();
 					e.printStackTrace();
+					closeIteratorConnection();
 					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
 				}
 			}
-			if (! hasNext) {
+			if (!hasNext) {
 				// time to say goodbye.
 				closeIteratorConnection();
 			}
@@ -135,12 +135,20 @@ public class DBSourceService extends PBSourceService {
 			return hasNext;
 		}
 
+		@Override
+		public DataEntry next() {
+			if (++count % 1000L == 0) {
+				logger.debug ("Processed {} items for this source.", count);
+			};
+			return currentEntry;
+		}
+
 		private void closeIteratorConnection() {
 			try {
 				conn.close();
 			} catch (SQLException e) {
 				logger.error("Couldn't close database source iterator connection.");
-					e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 
@@ -164,12 +172,6 @@ public class DBSourceService extends PBSourceService {
 			entry.addAttribute("objectClass", config.getObjectClasses());
 			return entry;
 		}
-
-		@Override
-		public DataEntry next() {
-			return currentEntry;
-		}
-
 	}
 
 	@Override
