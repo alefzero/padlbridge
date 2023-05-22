@@ -54,12 +54,12 @@ public class DBSourceService extends PBSourceService {
 	@Override
 	public Iterator<DataEntry> getAllEntries() {
 		try (Connection conn = bds.getConnection()) {
-			return new EntryIterator(conn, helper.getDBColumnsOfAttributes());
+			return new EntryIterator(helper.getDBColumnsOfAttributes());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new PadlUnrecoverableError(e);
 		} finally {
-			logger.trace(".getAllEntries returning EntryIterator of {}.", config.getName());
+			logger.trace(".getAllEntries returning EntryIterator for {}.", config.getName());
 		}
 	}
 
@@ -70,17 +70,17 @@ public class DBSourceService extends PBSourceService {
 		private ResultSet rs;
 		private Deque<String> dbColumns;
 
-		private EntryIterator(Connection conn, Deque<String> dbColumns) throws SQLException {
+		private EntryIterator(Deque<String> dbColumns) throws SQLException {
 			// TODO: change to LDAP columns so datamap can map to more than 1 column
-			this.conn = conn;
+			this.conn = bds.getConnection();
 			this.dbColumns = dbColumns;
 			prepareIterator();
 		}
 
 		private void prepareIterator() throws SQLException {
 			String normalizedQuery = helper.getSQLWithHash();
-			ps = conn.prepareStatement(normalizedQuery);
-			rs = ps.executeQuery();
+			this.ps = conn.prepareStatement(normalizedQuery);
+			this.rs = ps.executeQuery();
 
 		}
 
@@ -102,6 +102,7 @@ public class DBSourceService extends PBSourceService {
 					}
 				} catch (SQLException e) {
 					e.printStackTrace();
+					closeIteratorConnection();
 					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
 				}
 			}
@@ -121,12 +122,26 @@ public class DBSourceService extends PBSourceService {
 						}
 					}
 				} catch (SQLException e) {
+					closeIteratorConnection();
 					e.printStackTrace();
 					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
 				}
 			}
+			if (! hasNext) {
+				// time to say goodbye.
+				closeIteratorConnection();
+			}
 
 			return hasNext;
+		}
+
+		private void closeIteratorConnection() {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				logger.error("Couldn't close database source iterator connection.");
+					e.printStackTrace();
+			}
 		}
 
 		private boolean didConfigHasMultiValuedAttributes() {
