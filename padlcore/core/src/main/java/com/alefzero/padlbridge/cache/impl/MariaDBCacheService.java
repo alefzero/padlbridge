@@ -209,7 +209,7 @@ public class MariaDBCacheService extends PBCacheService {
 	public void removeFromCacheByDN(String sourceName, Deque<String> dnItems) {
 		logger.trace(".removeDNFromCache ");
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement ps = conn.prepareStatement(SQL_DELETE_DN_FROM_SOURCE);
+			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_DELETE_DN_FROM_SOURCE));
 			Iterator<String> iterator = dnItems.iterator();
 			int count = 0;
 			while (iterator.hasNext()) {
@@ -235,7 +235,7 @@ public class MariaDBCacheService extends PBCacheService {
 	public int getExpectedOperationFor(String sourceName, String uid, String hash) {
 		int _return = 0;
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement ps = conn.prepareStatement(SQL_SELECT_GET_HASH_FROM_CACHE);
+			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_SELECT_GET_HASH_FROM_CACHE));
 			ps.setString(1, Objects.requireNonNull(sourceName));
 			ps.setString(2, Objects.requireNonNull(uid));
 
@@ -264,14 +264,14 @@ public class MariaDBCacheService extends PBCacheService {
 				cacheOperationValue, sourceName, uid, dn, hash);
 		try (Connection conn = bds.getConnection()) {
 			if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_UPDATE) {
-				PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_HASH_VALUE_OF);
+				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_HASH_VALUE_OF));
 				ps.setString(1, Objects.requireNonNull(hash));
 				ps.setString(2, Objects.requireNonNull(sourceName));
 				ps.setString(3, Objects.requireNonNull(uid));
 				ps.executeUpdate();
 				ps.close();
 			} else if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_ADD) {
-				PreparedStatement ps = conn.prepareStatement(SQL_INSERT_ENTRY_TO_CACHE);
+				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_INSERT_ENTRY_TO_CACHE));
 				ps.setString(1, Objects.requireNonNull(sourceName));
 				ps.setString(2, Objects.requireNonNull(uid));
 				ps.setString(3, Objects.requireNonNull(dn));
@@ -306,8 +306,8 @@ public class MariaDBCacheService extends PBCacheService {
 			bds.setCacheState(false);
 
 			try (Connection conn = bds.getConnection()) {
-				conn.prepareStatement(SQL_CREATE_CURRENT_CACHE_TABLE).execute();
-				conn.prepareStatement(CREATE_CURRENT_CACHE_INDEX).execute();
+				conn.prepareStatement(formatSQL(SQL_CREATE_CURRENT_CACHE_TABLE)).execute();
+				conn.prepareStatement(formatSQL(CREATE_CURRENT_CACHE_INDEX)).execute();
 
 				PreparedStatement psn = conn.prepareStatement("");
 				PreparedStatement psc = conn.prepareStatement("");
