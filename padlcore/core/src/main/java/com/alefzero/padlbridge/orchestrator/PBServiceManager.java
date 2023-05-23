@@ -85,10 +85,9 @@ public class PBServiceManager {
 					serviceFactory);
 
 			if (serviceFactoryWithSameType != null) {
-				throw new PadlUnrecoverableError(
-						String.format(PInfo.msg("orchestrator.bootstrap.serviceIdAlreadyInUse"),
-								serviceFactory.getClass().getSimpleName(), serviceFactory.getServiceType(),
-								serviceFactoryWithSameType.getClass().getSimpleName()));
+				throw new PadlUnrecoverableError(PInfo.msg("orchestrator.bootstrap.serviceIdAlreadyInUse",
+						serviceFactory.getClass().getSimpleName(), serviceFactory.getServiceType(),
+						serviceFactoryWithSameType.getClass().getSimpleName()));
 			}
 
 		});

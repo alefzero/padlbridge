@@ -38,6 +38,7 @@ public class PBOrchestrator {
 
 	public void sync() {
 		logger.trace(".sync");
+		logger.debug("orchestrator.initAction");
 
 		cache.prepare();
 

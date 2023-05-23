@@ -23,6 +23,9 @@ public class App {
 	protected static final Logger logger = LogManager.getLogger();
 
 	public static void main(String[] args) {
+		logger.info(PInfo.msg("app.welcome-version"));
+		logger.debug(PInfo.log("app.argument-list", args));
+		
 		String action = args.length > 0 ? args[0] : "help";
 		String configurationFilename = getConfigurationFilename(args);
 		new App().run(action, configurationFilename);
@@ -54,17 +57,16 @@ public class App {
 	private void setupFromOSEnvironmentVariables() {
 		logger.trace(".setupFromSOEnvironmentVariables");
 		String padlLang = System.getenv("PADL_LANG");
-		logger.trace("padlLang = {} ", padlLang);
 		if (padlLang != null) {
-			logger.debug("Setting language to {} per PADL_LANG variable from OS", padlLang);
 			Locale.setDefault(new Locale(padlLang));
+			PInfo.setLocale(Locale.getDefault());
+			logger.debug(PInfo.log("app.lang-variable-setup", padlLang));
 		}
 	}
 
 	private void help() {
 		logger.trace(".help");
-		System.out.println(PInfo.msg("app.welcome-version"));
-		System.out.println(PInfo.msg("app.help"));
+		logger.info(PInfo.msg("app.help"));
 	}
 
 	private void runSyncProcess(String configurationFilename) {
@@ -72,11 +74,11 @@ public class App {
 
 		Thread shutdownListener = new Thread() {
 			public void run() {
-				logger.info("Shutdown requested. Waiting running process to end (max=10s).");
+				logger.info(PInfo.msg("app.shutdown-requested"));
 				try {
 					Thread.sleep(10000);
 				} catch (InterruptedException e) {
-					logger.trace("Error while ending runing process. Aborting.");
+					logger.error(PInfo.msg("app.aborting"));
 				}
 			}
 		};
