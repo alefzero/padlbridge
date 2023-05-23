@@ -4,11 +4,13 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.alefzero.padlbridge.exceptions.PadlUnrecoverableError;
 import com.alefzero.padlbridge.orchestrator.PBOrchestrator;
 import com.alefzero.padlbridge.orchestrator.PBServiceManager;
 import com.alefzero.padlbridge.util.PInfo;
@@ -25,11 +27,13 @@ public class App {
 	public static void main(String[] args) {
 		logger.info(PInfo.msg("app.welcome-version"));
 		logger.debug(PInfo.log("app.argument-list", args));
-		
+
 		String action = args.length > 0 ? args[0] : "help";
 		String configurationFilename = getConfigurationFilename(args);
 		new App().run(action, configurationFilename);
 	}
+
+	private ScheduledFuture<?> executor = null;
 
 	private void run(String action, String configurationFilename) {
 		logger.trace(".run [action: {}, configurationFilename: {}]", action, configurationFilename);
@@ -76,7 +80,11 @@ public class App {
 			public void run() {
 				logger.info(PInfo.msg("app.shutdown-requested"));
 				try {
-					Thread.sleep(10000);
+					if (executor != null) {
+						executor.cancel(false);
+						Thread.sleep(15000);
+					}
+					logger.info(PInfo.msg("app.shutdown"));
 				} catch (InterruptedException e) {
 					logger.error(PInfo.msg("app.aborting"));
 				}
@@ -85,12 +93,14 @@ public class App {
 
 		Runtime.getRuntime().addShutdownHook(shutdownListener);
 
-		PBServiceManager serviceManager = new PBServiceManager(Paths.get(configurationFilename));
-		PBOrchestrator orchestrator = new PBOrchestrator(serviceManager.getServices());
-
-		Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> orchestrator.sync(), 0, 30,
-				TimeUnit.SECONDS);
-
+		try {
+			PBServiceManager serviceManager = new PBServiceManager(Paths.get(configurationFilename));
+			PBOrchestrator orchestrator = new PBOrchestrator(serviceManager.getServices());
+			executor = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> orchestrator.sync(), 0,
+					30, TimeUnit.SECONDS);
+		} catch (PadlUnrecoverableError e) {
+			logger.error(e);
+		}
 	}
 
 }
