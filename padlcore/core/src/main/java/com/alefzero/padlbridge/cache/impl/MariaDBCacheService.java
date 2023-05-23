@@ -14,9 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alefzero.padlbridge.cache.PBCacheService;
-import com.alefzero.padlbridge.core.model.DataEntry;
-import com.unboundid.ldap.sdk.Entry;
-import com.unboundid.ldif.LDIFException;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class MariaDBCacheService extends PBCacheService {
 
@@ -126,7 +124,10 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	public String formatSQL(String sqlCreateCurrentCacheTable) {
-		return sqlCreateCurrentCacheTable.replace("$INSTANCE_NAME$", "cache_data_" + getInstanceName());
+		logger.trace(".formatSQL [{}}]", sqlCreateCurrentCacheTable);
+		String _return = sqlCreateCurrentCacheTable.replace("$INSTANCE_NAME$", "cache_data_" + getInstanceName());
+		logger.trace(".formatSQL [return: {}]", _return);
+		return _return;
 	}
 
 	private void createDBStructure(Connection conn) throws SQLException {
@@ -151,7 +152,8 @@ public class MariaDBCacheService extends PBCacheService {
 	public void syncUidsFromSource(String sourceName, Iterator<String> allDistinctUids) {
 		logger.trace(".setEntryUidAsFoundFor ");
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement psCheckAsFound = conn.prepareStatement(formatSQL(SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID));
+			PreparedStatement psCheckAsFound = conn
+					.prepareStatement(formatSQL(SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID));
 			int batchCount = 0;
 			while (allDistinctUids.hasNext()) {
 				String uid = allDistinctUids.next();
@@ -161,6 +163,7 @@ public class MariaDBCacheService extends PBCacheService {
 				psCheckAsFound.addBatch();
 
 				if (++batchCount > BATCH_COUNT) {
+					logger.trace(PInfo.log("cache.batch-commit-message"));
 					psCheckAsFound.executeBatch();
 					batchCount = 0;
 				}
@@ -171,7 +174,8 @@ public class MariaDBCacheService extends PBCacheService {
 			}
 			psCheckAsFound.close();
 
-			PreparedStatement psCheckAsToDelete = conn.prepareStatement(formatSQL(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE));
+			PreparedStatement psCheckAsToDelete = conn
+					.prepareStatement(formatSQL(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE));
 			psCheckAsToDelete.setInt(1, CACHED_ENTRY_STATUS_DELETE);
 			psCheckAsToDelete.setString(2, sourceName);
 			psCheckAsToDelete.setInt(3, CACHED_ENTRY_STATUS_UNSET);
@@ -284,119 +288,4 @@ public class MariaDBCacheService extends PBCacheService {
 			e.printStackTrace();
 		}
 	}
-
-	/// -------------------------------------------------------------------------------
-	/// -------------------------------------------------------------------------------
-	/// -------------------------------------------------------------------------------
-
-	protected void initializeDatasource() {
-		// TODO remove this example
-
-		logger.trace(".initializeResources ");
-
-		if (bds == null) {
-			logger.debug("Loading cache datasource.");
-			config = (MariaDBCacheConfig) super.getConfig();
-			bds = new BasicDataSource();
-			bds.setUrl(config.getJdbcURL());
-			bds.setUsername(config.getUsername());
-			bds.setPassword(config.getPassword());
-			bds.setMaxTotal(100);
-			bds.setMinIdle(10);
-			bds.setCacheState(false);
-
-			try (Connection conn = bds.getConnection()) {
-				conn.prepareStatement(formatSQL(SQL_CREATE_CURRENT_CACHE_TABLE)).execute();
-				conn.prepareStatement(formatSQL(CREATE_CURRENT_CACHE_INDEX)).execute();
-
-				PreparedStatement psn = conn.prepareStatement("");
-				PreparedStatement psc = conn.prepareStatement("");
-
-				int counter = 0;
-				logger.trace(".initializeDatasource loading");
-				for (int i = 0; i < 10_000; i++) {
-					counter++;
-
-					// config_id, dn, uid, hash, removed_line_flag
-					int k = 1;
-					psc.setString(k++, "config1");
-					psc.setString(k++, "uid=user_" + i + ",ou=users,dc=alefzero,dc=com");
-					psc.setString(k++, "user_" + i);
-					psc.setString(k++, "hash_user_" + i);
-					psc.setBoolean(k++, false);
-					psc.addBatch();
-
-					if (counter % 9999 != 0) {
-						k = 1;
-						psn.setString(k++, "config1");
-						psn.setString(k++, "uid=user_" + i + ",ou=users,dc=alefzero,dc=com");
-						psn.setString(k++, "user_" + i);
-						psn.setString(k++, "hash_user_" + i);
-						psn.setBoolean(k++, false);
-						psn.addBatch();
-					}
-
-					if (counter > 1000) {
-						psn.executeBatch();
-						psc.executeBatch();
-						counter = 0;
-					}
-				}
-				psn.executeBatch();
-				psc.executeBatch();
-				logger.trace(".initializeResources loaded");
-
-				psn.close();
-				psc.close();
-			} catch (SQLException e) {
-				logger.error("Problem processing cache: ", e);
-			}
-		}
-	}
-
-	class MyIterEntry implements Iterator<DataEntry> {
-		// TODO remove this example
-
-		private Connection conn;
-		private ResultSet rs;
-		private PreparedStatement ps;
-		private DataEntry current = null;
-
-		MyIterEntry(Connection conn) throws SQLException {
-			this.conn = conn;
-			init();
-		}
-
-		private void init() throws SQLException {
-			ps = conn.prepareStatement(
-					"select distinct dn, uid, hash from $INSTANCE_NAME$ where config_id = ? and uid = ? order by 1,2");
-			ps.setString(1, "config1");
-			rs = ps.executeQuery();
-		}
-
-		@Override
-		public boolean hasNext() {
-			boolean _return = false;
-			try {
-				_return = rs.next();
-				if (_return) {
-					current = new DataEntry(rs.getString(2),
-							new Entry("dn: " + rs.getString(1), "objectClass: inetOrgPerson",
-									"cn: Sir " + rs.getString(2), "sn: SN " + rs.getString(2),
-									"uid: " + rs.getString(2)),
-							rs.getString(3));
-				}
-			} catch (SQLException | LDIFException e) {
-				e.printStackTrace();
-			}
-			return _return;
-		}
-
-		@Override
-		public DataEntry next() {
-			return current;
-		}
-
-	}
-
 }

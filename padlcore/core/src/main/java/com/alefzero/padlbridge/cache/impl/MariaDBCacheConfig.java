@@ -2,6 +2,12 @@ package com.alefzero.padlbridge.cache.impl;
 
 import com.alefzero.padlbridge.config.model.CacheConfig;
 
+/**
+ * Represents YAML configuration for the MariaDB based cache
+ * 
+ * @author xandecelo
+ *
+ */
 public class MariaDBCacheConfig extends CacheConfig {
 
 	private String jdbcURL;
