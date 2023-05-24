@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 
 import com.alefzero.padlbridge.config.model.SourceConfig;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class DBSourceConfig extends SourceConfig {
 
@@ -29,10 +30,11 @@ public class DBSourceConfig extends SourceConfig {
 	@Override
 	public void checkConfiguration() {
 		super.checkConfiguration();
-		Objects.requireNonNull(jdbcURL, "Required attribute jdbcURL not found in source configuration.");
-		Objects.requireNonNull(query, "Required attribute query not found in source configuration.");
-		Objects.requireNonNull(objectClasses, "Required attribute objectClasses not found in source configuration.");
-		Objects.requireNonNull(uid, "Required attribute uid not found in source configuration.");
+		Objects.requireNonNull(jdbcURL, PInfo.msg("config.required-attribute-not-found", "jdbcURL", "source", this.getName()));
+		Objects.requireNonNull(query, PInfo.msg("config.required-attribute-not-found", "query", "source", this.getName()));
+		Objects.requireNonNull(objectClasses,
+				PInfo.msg("config.required-attribute-not-found", "objectClasses", "source", this.getName()));
+		Objects.requireNonNull(uid, PInfo.msg("config.required-attribute-not-found", "uid", "source", this.getName()));
 	}
 
 	public Map<String, String> getLdapToDBMap() {

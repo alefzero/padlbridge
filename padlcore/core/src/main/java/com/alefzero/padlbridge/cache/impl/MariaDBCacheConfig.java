@@ -3,6 +3,7 @@ package com.alefzero.padlbridge.cache.impl;
 import java.util.Objects;
 
 import com.alefzero.padlbridge.config.model.CacheConfig;
+import com.alefzero.padlbridge.util.PInfo;
 
 /**
  * Represents YAML configuration for the MariaDB based cache
@@ -42,7 +43,7 @@ public class MariaDBCacheConfig extends CacheConfig {
 
 	@Override
 	public void checkConfiguration() {
-		Objects.requireNonNull(jdbcURL, "Configuration file requires cache has a valid jdbcURL parameter");
+		Objects.requireNonNull(jdbcURL, PInfo.msg("config.required-attribute-not-found", "jdbcURL", "cache", "cache"));
 	}
 
 }

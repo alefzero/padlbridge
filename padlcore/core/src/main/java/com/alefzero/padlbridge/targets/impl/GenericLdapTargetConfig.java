@@ -1,6 +1,9 @@
 package com.alefzero.padlbridge.targets.impl;
 
+import java.util.Objects;
+
 import com.alefzero.padlbridge.config.model.TargetConfig;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class GenericLdapTargetConfig extends TargetConfig {
 
@@ -14,8 +17,8 @@ public class GenericLdapTargetConfig extends TargetConfig {
 	@Override
 	public void checkConfiguration() {
 		super.checkConfiguration();
-		assert host != null : "Required attribute host not found in target configuration.";
-		assert rootDN != null : "Required attribute rootDN not found in target configuration.";
+		Objects.requireNonNull(host, PInfo.msg("config.required-attribute-not-found", "host", "target", "target"));
+		Objects.requireNonNull(rootDN, PInfo.msg("config.required-attribute-not-found", "rootDN", "target", "target"));
 	}
 
 	public String getHost() {

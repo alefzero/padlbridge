@@ -3,6 +3,7 @@ package com.alefzero.padlbridge.sources.impl;
 import java.util.Objects;
 
 import com.alefzero.padlbridge.config.model.SourceConfig;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class LdifSourceConfig extends SourceConfig {
 
@@ -11,7 +12,7 @@ public class LdifSourceConfig extends SourceConfig {
 	@Override
 	public void checkConfiguration() {
 		super.checkConfiguration();
-		Objects.requireNonNull(ldif, "Required attribute ldif not found in source configuration.");
+		Objects.requireNonNull(ldif, PInfo.msg("config.required-attribute-not-found", "ldif", "source", this.getName()));
 	}
 
 	public String getLdif() {

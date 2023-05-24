@@ -3,6 +3,7 @@ package com.alefzero.padlbridge.sources.impl;
 import java.util.Objects;
 
 import com.alefzero.padlbridge.config.model.SourceConfig;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class LdapSourceConfig extends SourceConfig {
 	private String host;
@@ -15,8 +16,8 @@ public class LdapSourceConfig extends SourceConfig {
 	@Override
 	public void checkConfiguration() {
 		super.checkConfiguration();
-		Objects.requireNonNull(host, "Required attribute objectClasses not found in source configuration.");
-		Objects.requireNonNull(baseDN, "Required attribute baseDN not found in source configuration.");
+		Objects.requireNonNull(host, PInfo.msg("config.required-attribute-not-found", "host", "source", this.getName()));
+		Objects.requireNonNull(baseDN, PInfo.msg("config.required-attribute-not-found", "baseDN", "source", this.getName()));
 	}
 
 	public String getHost() {
