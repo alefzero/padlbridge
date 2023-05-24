@@ -12,6 +12,7 @@ public class LdifSourceConfig extends SourceConfig {
 	@Override
 	public void checkConfiguration() {
 		super.checkConfiguration();
+		Objects.requireNonNull(getDn(), PInfo.msg("config.required-attribute-not-found", "dn", "source", this.getName()));
 		Objects.requireNonNull(ldif, PInfo.msg("config.required-attribute-not-found", "ldif", "source", this.getName()));
 	}
 

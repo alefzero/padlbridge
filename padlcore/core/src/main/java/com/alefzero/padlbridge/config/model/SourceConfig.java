@@ -47,7 +47,6 @@ public abstract class SourceConfig implements PBGenericConfig {
 	public void checkConfiguration() {
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(name, PInfo.msg("config.required-attribute-not-found", "name", "source", this.getName()));
-		Objects.requireNonNull(dn, PInfo.msg("config.required-attribute-not-found", "dn", "source", this.getName()));
 	}
 
 	@Override

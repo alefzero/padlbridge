@@ -30,11 +30,17 @@ public class DBSourceConfig extends SourceConfig {
 	@Override
 	public void checkConfiguration() {
 		super.checkConfiguration();
-		Objects.requireNonNull(jdbcURL, PInfo.msg("config.required-attribute-not-found", "jdbcURL", "source", this.getName()));
-		Objects.requireNonNull(query, PInfo.msg("config.required-attribute-not-found", "query", "source", this.getName()));
-		Objects.requireNonNull(objectClasses,
-				PInfo.msg("config.required-attribute-not-found", "objectClasses", "source", this.getName()));
+		Objects.requireNonNull(getDn(),
+				PInfo.msg("config.required-attribute-not-found", "dn", "source", this.getName()));
+		Objects.requireNonNull(jdbcURL,
+				PInfo.msg("config.required-attribute-not-found", "jdbcURL", "source", this.getName()));
+		Objects.requireNonNull(query,
+				PInfo.msg("config.required-attribute-not-found", "query", "source", this.getName()));
 		Objects.requireNonNull(uid, PInfo.msg("config.required-attribute-not-found", "uid", "source", this.getName()));
+		if (!"update".equalsIgnoreCase(getDefaultOperation())) {
+			Objects.requireNonNull(objectClasses,
+					PInfo.msg("config.required-attribute-not-found", "objectClasses", "source", this.getName()));
+		}
 	}
 
 	public Map<String, String> getLdapToDBMap() {
