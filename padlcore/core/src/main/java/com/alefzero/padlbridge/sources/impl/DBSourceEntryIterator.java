@@ -139,7 +139,9 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 			String data = Objects.requireNonNullElse(rs.getString(cols.getValue()), "");
 			entry.addAttribute(cols.getKey(), data);
 		}
-		entry.addAttribute("objectClass", config.getObjectClasses());
+		if (config.getObjectClasses() != null && ! config.getObjectClasses().isEmpty()) {
+			entry.addAttribute("objectClass", config.getObjectClasses());
+		}
 		logger.trace(".createLdapEntryFrom result: {}", entry);
 		return entry;
 	}
