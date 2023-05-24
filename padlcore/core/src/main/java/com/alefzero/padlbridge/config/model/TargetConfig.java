@@ -1,6 +1,8 @@
 package com.alefzero.padlbridge.config.model;
 
-public class TargetConfig  implements PBGenericConfig {
+import java.util.Objects;
+
+public abstract class TargetConfig implements PBGenericConfig {
 
 	private String type;
 
@@ -15,6 +17,11 @@ public class TargetConfig  implements PBGenericConfig {
 	@Override
 	public String toString() {
 		return "TargetConfig [type=" + type + "]";
+	}
+
+	@Override
+	public void checkConfiguration() {
+		Objects.requireNonNull(type);
 	}
 
 }

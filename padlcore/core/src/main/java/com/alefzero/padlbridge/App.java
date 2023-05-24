@@ -99,6 +99,7 @@ public class App {
 			executor = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> orchestrator.sync(), 0,
 					30, TimeUnit.SECONDS);
 		} catch (PadlUnrecoverableError e) {
+			e.printStackTrace();
 			logger.error(e);
 		}
 	}

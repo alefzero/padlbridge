@@ -1,5 +1,7 @@
 package com.alefzero.padlbridge.cache.impl;
 
+import java.util.Objects;
+
 import com.alefzero.padlbridge.config.model.CacheConfig;
 
 /**
@@ -36,6 +38,11 @@ public class MariaDBCacheConfig extends CacheConfig {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Override
+	public void checkConfiguration() {
+		Objects.requireNonNull(jdbcURL, "Configuration file requires cache has a valid jdbcURL parameter");
 	}
 
 }

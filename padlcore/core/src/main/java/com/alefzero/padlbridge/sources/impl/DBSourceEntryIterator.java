@@ -118,34 +118,30 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 	}
 
 	private boolean didConfigHasMultiValuedAttributes() {
-		logger.trace(".didConfigHasMultiValuedAttributes result: {}", config.getMultiValueAttributes().size() > 0);
+		logger.trace(".didConfigHasMultiValuedAttributes result: [{}]", config.getMultiValueAttributes().size() > 0);
 		return config.getMultiValueAttributes().size() > 0;
 	}
 
 	private boolean isLineAlreadyFetchedFromDB() {
-		logger.trace(".isLineAlreadyFetchedFromDB result: {}", nextEntry != null);
+		logger.trace(".isLineAlreadyFetchedFromDB result: [{}]", nextEntry != null);
 		return nextEntry != null;
 	}
 
 	public boolean isNextLineFromSourceAnotherEntry(ResultSet rs) throws SQLException {
 		boolean _return = !currentEntry.getUid().equals(rs.getString(config.getUid()));
-		logger.trace(".isNextLineFromSourceAnotherEntry result: {}", _return);
+		logger.trace(".isNextLineFromSourceAnotherEntry result: [{}]", _return);
 		return _return;
 	}
 
 	private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
 		logger.trace(".createLdapEntryFrom");
 		Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
-		logger.trace(".createLdapEntryFrom:entry");
 		for (String dbColumn : dbColumns) {
-			logger.trace(".createLdapEntryFrom:looking for collumn {}", dbColumn);
-			logger.trace(".createLdapEntryFrom:addAttribute {}, {}", config.getLdapAttributeNameFor(dbColumn),
-					rs.getString(dbColumn));
 			entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
 		}
-		logger.trace(".createLdapEntryFrom:objectClass {}", config.getObjectClasses());
 		entry.addAttribute("objectClass", config.getObjectClasses());
 		logger.trace(".createLdapEntryFrom result: {}", entry);
 		return entry;
 	}
+
 }

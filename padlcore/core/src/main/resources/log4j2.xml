@@ -10,7 +10,10 @@
         <Root level="error">
             <AppenderRef ref="Console" />
         </Root>
-        <Logger name="com.alefzero" level="trace" additivity="false">
+        <Logger name="com.alefzero" level="debug" additivity="false">
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Logger name="com.alefzero.padlbridge.targets" level="trace" additivity="false">
             <AppenderRef ref="Console" />
         </Logger>
     </Loggers>

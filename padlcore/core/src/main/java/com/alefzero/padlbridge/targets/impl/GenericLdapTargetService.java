@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.alefzero.padlbridge.targets.LDAPCodes;
 import com.alefzero.padlbridge.targets.PBTargetService;
+import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Entry;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
@@ -58,9 +59,9 @@ public class GenericLdapTargetService extends PBTargetService {
 	public void modify(Entry entry) {
 		try (LDAPConnection conn = pool.getConnection()) {
 			List<Modification> mods = new ArrayList<Modification>();
-			entry.getAttributes().forEach(attribute -> {
+			for (Attribute attribute : entry.getAttributes()) {
 				mods.add(new Modification(ModificationType.REPLACE, attribute.getName(), attribute.getValues()));
-			});
+			}
 			ModifyRequest request = new ModifyRequest(entry.getDN(), mods);
 			conn.modify(request);
 		} catch (LDAPException e) {
@@ -158,6 +159,5 @@ public class GenericLdapTargetService extends PBTargetService {
 			e.printStackTrace();
 		}
 	}
-
 
 }

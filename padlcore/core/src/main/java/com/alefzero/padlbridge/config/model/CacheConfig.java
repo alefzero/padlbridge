@@ -1,6 +1,6 @@
 package com.alefzero.padlbridge.config.model;
 
-public class CacheConfig implements PBGenericConfig {
+public abstract class CacheConfig implements PBGenericConfig {
 
 	private String type;
 

@@ -5,11 +5,18 @@ import com.alefzero.padlbridge.config.model.TargetConfig;
 public class GenericLdapTargetConfig extends TargetConfig {
 
 	private String host;
-	private int port = 10389;
+	private int port = 389;
 	private String useTLS;
 	private String rootDN;
 	private String adminPassword;
 	private String adminUser;
+
+	@Override
+	public void checkConfiguration() {
+		super.checkConfiguration();
+		assert host != null : "Required attribute host not found in target configuration.";
+		assert rootDN != null : "Required attribute rootDN not found in target configuration.";
+	}
 
 	public String getHost() {
 		return host;

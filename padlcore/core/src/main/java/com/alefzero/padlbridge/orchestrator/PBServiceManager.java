@@ -78,7 +78,7 @@ public class PBServiceManager {
 		ServiceLoader<T> serviceFactories = ServiceLoader.load(classType);
 
 		serviceFactories.forEach(serviceFactory -> {
-			logger.trace("Loading component {} (id: {}) to items[{}].", serviceFactory.getClass().getSimpleName(),
+			logger.debug("Loading component {} (id: {}) to items[{}].", serviceFactory.getClass().getSimpleName(),
 					serviceFactory.getServiceType(), factoryCollection);
 
 			var serviceFactoryWithSameType = factoryCollection.putIfAbsent(serviceFactory.getServiceType(),
@@ -107,10 +107,12 @@ public class PBServiceManager {
 			PBCacheFactory cacheFactory = this.getCacheFactoryByType(rootTree.get("cache").get("type").asText());
 			CacheConfig cacheConfig = mapper.treeToValue(rootTree.get("cache"), cacheFactory.getConfigClass());
 			PBCacheService cacheService = cacheFactory.getInstance();
+			cacheConfig.checkConfiguration();
 			cacheService.setConfig(cacheConfig);
 
 			PBTargetFactory targetFactory = getTargetFactoryByType(rootTree.get("target").get("type").asText());
 			TargetConfig targetConfig = mapper.treeToValue(rootTree.get("target"), targetFactory.getConfigClass());
+			targetConfig.checkConfiguration();
 			PBTargetService targetService = targetFactory.getInstance();
 			targetService.setConfig(targetConfig);
 
@@ -120,6 +122,7 @@ public class PBServiceManager {
 
 				PBSourceFactory sourceFactory = getSourceFactoryByType(source.get("type").asText());
 				SourceConfig sourceConfig = mapper.treeToValue(source, sourceFactory.getConfigClass());
+				sourceConfig.checkConfiguration();
 				PBSourceService sourceService = sourceFactory.getInstance();
 				sourceService.setConfig(sourceConfig);
 

@@ -124,7 +124,7 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	public String formatSQL(String sqlCreateCurrentCacheTable) {
-		logger.trace(".formatSQL [{}}]", sqlCreateCurrentCacheTable);
+		logger.trace(".formatSQL [{}}] + instanceName: [{}]", sqlCreateCurrentCacheTable, getInstanceName());
 		String _return = sqlCreateCurrentCacheTable.replace("$INSTANCE_NAME$", "cache_data_" + getInstanceName());
 		logger.trace(".formatSQL [return: {}]", _return);
 		return _return;

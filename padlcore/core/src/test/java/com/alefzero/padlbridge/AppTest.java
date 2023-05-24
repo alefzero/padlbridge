@@ -46,7 +46,7 @@ class AppTest {
 
 				assertNotNull(entry);
 
-				Thread.sleep(1);
+				Thread.sleep(1000000);
 
 				// Disconnect from the server and cause the server to shut down.
 				conn.close();

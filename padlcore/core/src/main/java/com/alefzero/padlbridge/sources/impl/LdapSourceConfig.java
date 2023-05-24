@@ -1,14 +1,23 @@
 package com.alefzero.padlbridge.sources.impl;
 
+import java.util.Objects;
+
 import com.alefzero.padlbridge.config.model.SourceConfig;
 
 public class LdapSourceConfig extends SourceConfig {
 	private String host;
-	private int port;
+	private int port = 389;
 	private String username;
 	private String password;
 	private String useTLS;
 	private String baseDN;
+
+	@Override
+	public void checkConfiguration() {
+		super.checkConfiguration();
+		Objects.requireNonNull(host, "Required attribute objectClasses not found in source configuration.");
+		Objects.requireNonNull(baseDN, "Required attribute baseDN not found in source configuration.");
+	}
 
 	public String getHost() {
 		return host;
