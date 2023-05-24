@@ -32,6 +32,11 @@ public class DBSourceConfig extends SourceConfig {
 		Objects.requireNonNull(jdbcURL, "Required attribute jdbcURL not found in source configuration.");
 		Objects.requireNonNull(query, "Required attribute query not found in source configuration.");
 		Objects.requireNonNull(objectClasses, "Required attribute objectClasses not found in source configuration.");
+		Objects.requireNonNull(uid, "Required attribute uid not found in source configuration.");
+	}
+
+	public Map<String, String> getLdapToDBMap() {
+		return ldapColToDB;
 	}
 
 	public String getJdbcURL() {
@@ -67,7 +72,7 @@ public class DBSourceConfig extends SourceConfig {
 	}
 
 	public String getUid() {
-		return Objects.requireNonNull(uid);
+		return uid;
 	}
 
 	public void setUid(String uid) {

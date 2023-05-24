@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +25,7 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 	private ResultSet rs;
 	private DataEntry currentEntry;
 	private DataEntry nextEntry = null;
-	private Deque<String> dbColumns;
+	// private Deque<String> dbColumns;
 	private Long count = 0L;
 	private DBSourceConfig config;
 	private DBDialectHelper helper;
@@ -31,10 +33,9 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 	protected DBSourceEntryIterator(Connection conn, DBSourceConfig config, DBDialectHelper helper)
 			throws SQLException {
 		logger.trace("Creating iterator for {}", config.getName());
-		// TODO: change to LDAP columns so datamap can map to more than 1 column
 		this.conn = conn;
 		this.helper = helper;
-		this.dbColumns = helper.getDBColumnsOfAttributes();
+		// this.dbColumns = helper.getDBColumnsOfAttributes();
 		this.config = config;
 		prepareIterator();
 	}
@@ -136,8 +137,9 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 	private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
 		logger.trace(".createLdapEntryFrom");
 		Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
-		for (String dbColumn : dbColumns) {
-			entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
+		for (java.util.Map.Entry<String, String> cols : config.getLdapToDBMap().entrySet()) {
+			String data = Objects.requireNonNullElse(rs.getString(cols.getValue()), "");
+			entry.addAttribute(cols.getKey(), data);
 		}
 		entry.addAttribute("objectClass", config.getObjectClasses());
 		logger.trace(".createLdapEntryFrom result: {}", entry);

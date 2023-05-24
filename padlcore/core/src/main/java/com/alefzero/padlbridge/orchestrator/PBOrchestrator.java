@@ -32,6 +32,7 @@ public class PBOrchestrator {
 
 	public PBOrchestrator(PBLoadedServices services) {
 		super();
+		logger.debug(PInfo.log("orchestrator.initAction"));
 		this.cache = services.getCache();
 		this.target = services.getTarget();
 		this.sources = services.getSources();
@@ -41,67 +42,74 @@ public class PBOrchestrator {
 
 	public void sync() {
 		logger.trace(".sync");
-		logger.debug("orchestrator.initAction");
-
 		cache.prepare();
+		try {
 
-		sourcesInReverseOrder.forEach(source -> {
-			logger.debug("Checking for removed items for source {}", source.getName());
-			cache.syncUidsFromSource(source.getName(), source.getAllUids());
-			Deque<String> deletedDNs = target.deleteAll(cache.getAllDNsToBeDeletedFromSource(source.getName()));
-			cache.removeFromCacheByDN(source.getName(), deletedDNs);
-		});
+			for (PBSourceService source : sourcesInReverseOrder) {
+				logger.debug(PInfo.log("orchestrator.check-items-to-delete", source.getName()));
+				cache.syncUidsFromSource(source.getName(), source.getAllUids());
+				Deque<String> deletedDNs = target.deleteAll(cache.getAllDNsToBeDeletedFromSource(source.getName()));
+				cache.removeFromCacheByDN(source.getName(), deletedDNs);
+			}
 
-		sources.forEach(source -> {
-			logger.debug("Checking for items to add/modify at source {}", source.getName());
-// 			maybe
-//			Spliterator<DataEntry> split = Spliterators.spliteratorUnknownSize(source.getAllEntries(), 0);
-//			StreamSupport.stream(split, true).parallel().forEach(dataEntry -> {
-			
-			Iterator<DataEntry> iterator = source.getAllEntries();
-			while (iterator.hasNext()) {
-				DataEntry dataEntry = iterator.next();
-				int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
-						dataEntry.getHash());
-				if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
-					// DO NOTHING
-				} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation
-						|| "update".equalsIgnoreCase(source.getConfig().getDefaultOperation())) {
-					target.modify(dataEntry.getEntry());
-					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
-							dataEntry.getEntry().getDN(), dataEntry.getHash());
-				} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
-					target.add(dataEntry.getEntry());
-					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
-							dataEntry.getEntry().getDN(), dataEntry.getHash());
-				} else {
-					logger.error("Error processing data: operation {} for DN: {}", operation,
-							dataEntry.getEntry().getDN());
+			for (PBSourceService source : sources) {
+				logger.debug(PInfo.log("orchestrator.check-items-to-add-or-modify", source.getName()));
+
+				Iterator<DataEntry> iterator = source.getAllEntries();
+				while (iterator.hasNext()) {
+					DataEntry dataEntry = iterator.next();
+					int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
+							dataEntry.getHash());
+					if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
+						// DO NOTHING
+					} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation
+							|| "update".equalsIgnoreCase(source.getConfig().getDefaultOperation())) {
+						target.modify(dataEntry.getEntry());
+						cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
+								dataEntry.getEntry().getDN(), dataEntry.getHash());
+					} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
+						target.add(dataEntry.getEntry());
+						cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
+								dataEntry.getEntry().getDN(), dataEntry.getHash());
+					} else {
+						logger.error("Error processing data: operation {} for DN: {}", operation,
+								dataEntry.getEntry().getDN());
+					}
 				}
 			}
-		
-//			source.getAllEntries().forEachRemaining(dataEntry -> {
-//				int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
-//						dataEntry.getHash());
-//				if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
-//					// DO NOTHING
-//				} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation
-//						|| "update".equalsIgnoreCase(source.getConfig().getDefaultOperation())) {
-//					target.modify(dataEntry.getEntry());
-//					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
-//							dataEntry.getEntry().getDN(), dataEntry.getHash());
-//				} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
-//					target.add(dataEntry.getEntry());
-//					cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
-//							dataEntry.getEntry().getDN(), dataEntry.getHash());
-//				} else {
-//					logger.error("Error processing data: operation {} for DN: {}", operation,
-//							dataEntry.getEntry().getDN());
-//				}
-//			});
-		});
-		
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(PInfo.msg("orchestrator.source-error-try-next"));
+		}
+
 		logger.info(PInfo.msg("orchestrator.waiting-next-process"));
 
 	}
 }
+
+// Note
+
+//	maybe
+//Spliterator<DataEntry> split = Spliterators.spliteratorUnknownSize(source.getAllEntries(), 0);
+//StreamSupport.stream(split, true).parallel().forEach(dataEntry -> {
+
+//source.getAllEntries().forEachRemaining(dataEntry -> {
+//	int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
+//			dataEntry.getHash());
+//	if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
+//		// DO NOTHING
+//	} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation
+//			|| "update".equalsIgnoreCase(source.getConfig().getDefaultOperation())) {
+//		target.modify(dataEntry.getEntry());
+//		cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
+//				dataEntry.getEntry().getDN(), dataEntry.getHash());
+//	} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
+//		target.add(dataEntry.getEntry());
+//		cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
+//				dataEntry.getEntry().getDN(), dataEntry.getHash());
+//	} else {
+//		logger.error("Error processing data: operation {} for DN: {}", operation,
+//				dataEntry.getEntry().getDN());
+//	}
+//});
