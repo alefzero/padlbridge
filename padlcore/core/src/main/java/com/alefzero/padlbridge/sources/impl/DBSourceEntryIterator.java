@@ -136,8 +136,10 @@ public class DBSourceEntryIterator implements Iterator<DataEntry> {
 		logger.trace(".createLdapEntryFrom");
 		Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
 		for (java.util.Map.Entry<String, String> cols : config.getLdapToDBMap().entrySet()) {
-			String data = Objects.requireNonNullElse(rs.getString(cols.getValue()), "");
-			entry.addAttribute(cols.getKey(), data);
+			String data = rs.getString(cols.getValue());
+			if (data != null) {
+				entry.addAttribute(cols.getKey(), data);
+			}
 		}
 		if (config.getObjectClasses() != null && ! config.getObjectClasses().isEmpty()) {
 			entry.addAttribute("objectClass", config.getObjectClasses());
