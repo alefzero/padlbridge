@@ -58,8 +58,7 @@ public class PBOrchestrator {
 
 				Iterator<DataEntry> iterator = source.getAllEntries();
 
-				OperationalActions cacheDefaultAddOperation = cache
-						.getBehaviourForAddingNewEntries(source.getConfig().getDefaultOperation());
+				OperationalActions cacheDefaultAddOperation = source.getConfig().getDefaultOperation();
 
 				while (iterator.hasNext()) {
 

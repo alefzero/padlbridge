@@ -62,7 +62,7 @@ public class GenericLdapTargetService extends PBTargetService {
 			conn.add(entry);
 		} catch (LDAPException e) {
 			if (e.getResultCode().intValue() == LDAPCodes.ENTRY_ALREADY_EXISTS) {
-				logger.error("dn {} already exists at LDAP. Add will be ignored.", entry);
+				logger.error("LDAP entry with dn {} already exists at LDAP. Add will be ignored.", entry);
 			} else {
 				logger.error("Error processing target LDAP operation - dn {}. {}  {}", entry, e.getResultString(),
 						e.getResultCode());
@@ -106,7 +106,7 @@ public class GenericLdapTargetService extends PBTargetService {
 					conn.add(item);
 				} catch (LDAPException e) {
 					if (e.getResultCode().intValue() == LDAPCodes.ENTRY_ALREADY_EXISTS) {
-						logger.error("dn {} already exists at LDAP. Add will be ignored.", item);
+						logger.error("LDAP entry dn {} already exists at LDAP. Add will be ignored.", item);
 					} else {
 						throw e;
 					}
