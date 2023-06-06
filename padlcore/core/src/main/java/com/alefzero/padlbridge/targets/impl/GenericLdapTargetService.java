@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.alefzero.padlbridge.exceptions.PadlRecoverableException;
 import com.alefzero.padlbridge.targets.LDAPCodes;
 import com.alefzero.padlbridge.targets.PBTargetService;
 import com.unboundid.ldap.sdk.Attribute;
@@ -19,7 +20,6 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.ModifyRequest;
-import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
@@ -30,12 +30,15 @@ public class GenericLdapTargetService extends PBTargetService {
 	private LDAPConnectionPool pool = null;
 	private GenericLdapTargetConfig config = null;
 
-	private LDAPConnection getConnection() throws LDAPException {
+	private LDAPConnection getConnection() throws PadlRecoverableException {
 		if (pool == null) {
 			prepare();
+		}
+		try {
 			return pool.getConnection();
-		} else {
-			throw new LDAPException(ResultCode.CONNECT_ERROR);
+		} catch (LDAPException e) {
+			e.printStackTrace();
+			throw new PadlRecoverableException("Cannot connect to target LDAP.");
 		}
 
 	}
