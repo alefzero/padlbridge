@@ -43,6 +43,10 @@ public abstract class SourceConfig implements PBGenericConfig {
 		this.defaultOperation = defaultOperation;
 	}
 
+	public void setDefaultOperation(String defaultOperation) {
+		this.defaultOperation = OperationalActions.valueOf(defaultOperation);
+	}
+
 	@Override
 	public void checkConfiguration() {
 		Objects.requireNonNull(type);
