@@ -104,6 +104,13 @@ public class PBOrchestrator {
 		logger.info(PInfo.msg("orchestrator.waiting-next-process"));
 
 	}
+	
+	
+	public static void main(String[] args) {
+		System.out.println(OperationalActions.valueOf("update"));
+	}
+	
+	
 }
 
 // Note
@@ -131,3 +138,6 @@ public class PBOrchestrator {
 //				dataEntry.getEntry().getDN());
 //	}
 //});
+
+
+

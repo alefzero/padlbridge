@@ -27,4 +27,5 @@ public enum OperationalActions {
 	public static OperationalActions fromOperationalValue(Integer value) {
 		return Objects.requireNonNull(actions.get(value), "Value " + value + " does not map to a valid action.");
 	}
+
 }

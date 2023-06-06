@@ -44,7 +44,7 @@ public abstract class SourceConfig implements PBGenericConfig {
 	}
 
 	public void setDefaultOperation(String defaultOperation) {
-		this.defaultOperation = OperationalActions.valueOf(defaultOperation);
+		this.defaultOperation = OperationalActions.valueOf(Objects.requireNonNull(defaultOperation).toUpperCase());
 	}
 
 	@Override
