@@ -9,7 +9,7 @@ public abstract class SourceConfig implements PBGenericConfig {
 	private String type;
 	private String name;
 	private String dn;
-	private OperationalActions defaultOperation;
+	private OperationalActions defaultOperation = OperationalActions.UNSET;
 
 	public String getType() {
 		return type;

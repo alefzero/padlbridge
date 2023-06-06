@@ -58,16 +58,15 @@ public class PBOrchestrator {
 
 				Iterator<DataEntry> iterator = source.getAllEntries();
 
-				OperationalActions cacheDefaultAddOperation = source.getConfig().getDefaultOperation();
+				OperationalActions sourceDefaultOperation = source.getConfig().getDefaultOperation();
 
 				while (iterator.hasNext()) {
 
 					DataEntry dataEntry = iterator.next();
-					OperationalActions action = cache.getExpectedOperationFor(cacheDefaultAddOperation,
-							source.getName(), dataEntry.getUid(), dataEntry.getHash());
+					OperationalActions action = cache.getExpectedOperationFor(sourceDefaultOperation, source.getName(),
+							dataEntry.getUid(), dataEntry.getHash());
 
 					switch (action) {
-					case UNSET:
 					case EXISTS:
 					case DO_NOTHING:
 						break;
@@ -86,6 +85,10 @@ public class PBOrchestrator {
 						break;
 					case DELETE:
 						// treated by prior loop phase
+						break;
+					case UNSET:
+						logger.error("Deafult operation action for source {} is unset ({}).", source.getName(),
+								sourceDefaultOperation);
 						break;
 					default:
 						logger.error("Error processing data: operation {} for DN: {}", action,
