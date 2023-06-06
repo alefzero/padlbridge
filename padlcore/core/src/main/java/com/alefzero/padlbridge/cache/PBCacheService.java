@@ -92,12 +92,15 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * Check and return the operation to be executed for this uid entry at the
 	 * target, based on source data.
 	 * 
-	 * @param soourceName
+	 * @param defaultAddOperation when a entry is already found at the target,
+	 *                            should just update or replace it completely
+	 * @param sourceName
 	 * @param uid
 	 * @param hash
 	 * @return
 	 */
-	public abstract OperationalActions getExpectedOperationFor(String sourceName, String uid, String hash);
+	public abstract OperationalActions getExpectedOperationFor(OperationalActions defaultAddOperation,
+			String sourceName, String uid, String hash);
 
 	/**
 	 * Update hash entry for this cache. Used to sync the result operation after
@@ -110,7 +113,16 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * @param hash
 	 * @return
 	 */
-	public abstract void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid, String dn,
-			String hash);
+	public abstract void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid,
+			String dn, String hash);
+
+	/**
+	 * 
+	 * @param operationalActions
+	 * @return
+	 */
+	public OperationalActions getBehaviourForAddingNewEntries(OperationalActions operationalActions) {
+		return operationalActions == OperationalActions.REPLACE ? OperationalActions.REPLACE : OperationalActions.ADD;
+	}
 
 }

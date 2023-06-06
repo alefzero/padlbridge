@@ -57,11 +57,15 @@ public class PBOrchestrator {
 				logger.debug(PInfo.log("orchestrator.check-items-to-add-or-modify", source.getName()));
 
 				Iterator<DataEntry> iterator = source.getAllEntries();
+
+				OperationalActions cacheDefaultAddOperation = cache
+						.getBehaviourForAddingNewEntries(source.getConfig().getDefaultOperation());
+
 				while (iterator.hasNext()) {
 
 					DataEntry dataEntry = iterator.next();
-					OperationalActions action = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
-							dataEntry.getHash());
+					OperationalActions action = cache.getExpectedOperationFor(cacheDefaultAddOperation, source.getName(),
+							dataEntry.getUid(), dataEntry.getHash());
 
 					switch (action) {
 					case UNSET:

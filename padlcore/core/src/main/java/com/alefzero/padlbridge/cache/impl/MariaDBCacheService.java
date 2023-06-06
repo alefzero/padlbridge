@@ -237,8 +237,10 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	public OperationalActions getExpectedOperationFor(String sourceName, String uid, String hash) {
-		OperationalActions _return = null;
+	public OperationalActions getExpectedOperationFor(OperationalActions defaultAddOperation, String sourceName,
+			String uid, String hash) {
+		OperationalActions _return = defaultAddOperation;
+
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_SELECT_GET_HASH_FROM_CACHE));
 			ps.setString(1, Objects.requireNonNull(sourceName));
@@ -246,11 +248,8 @@ public class MariaDBCacheService extends PBCacheService {
 
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
-				_return = Objects.requireNonNull(hash).equals(rs.getString(1))
-						? OperationalActions.DO_NOTHING
+				_return = Objects.requireNonNull(hash).equals(rs.getString(1)) ? OperationalActions.DO_NOTHING
 						: OperationalActions.UPDATE;
-			} else {
-				_return = OperationalActions.ADD;
 			}
 			rs.close();
 			ps.close();
@@ -263,7 +262,8 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	public void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid, String dn, String hash) {
+	public void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid, String dn,
+			String hash) {
 		logger.trace(
 				".updateCacheWithData int cacheOperationValue={}, String sourceName={}, String uid={}, String dn={}, String hash={}",
 				operationalAction, sourceName, uid, dn, hash);
