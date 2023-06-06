@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alefzero.padlbridge.config.model.CacheConfig;
+import com.alefzero.padlbridge.config.model.OperationalActions;
 import com.alefzero.padlbridge.exceptions.PadlRecoverableException;
 import com.alefzero.padlbridge.orchestrator.PBGenericService;
 import com.alefzero.padlbridge.targets.PBTargetService;
@@ -17,13 +18,6 @@ import com.alefzero.padlbridge.util.PInfo;
 public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 
 	protected static final Logger logger = LogManager.getLogger();
-
-	public static final int CACHED_ENTRY_STATUS_UNSET = 0;
-	public static final int CACHED_ENTRY_STATUS_EXISTS = 1;
-	public static final int CACHED_ENTRY_STATUS_DELETE = 2;
-	public static final int CACHED_ENTRY_STATUS_ADD = 3;
-	public static final int CACHED_ENTRY_STATUS_UPDATE = 4;
-	public static final int CACHED_ENTRY_STATUS_DO_NOTHING = 5;
 
 	private String instanceName = "default";
 
@@ -103,7 +97,7 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * @param hash
 	 * @return
 	 */
-	public abstract int getExpectedOperationFor(String sourceName, String uid, String hash);
+	public abstract OperationalActions getExpectedOperationFor(String sourceName, String uid, String hash);
 
 	/**
 	 * Update hash entry for this cache. Used to sync the result operation after
@@ -116,7 +110,7 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * @param hash
 	 * @return
 	 */
-	public abstract void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn,
+	public abstract void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid, String dn,
 			String hash);
 
 }

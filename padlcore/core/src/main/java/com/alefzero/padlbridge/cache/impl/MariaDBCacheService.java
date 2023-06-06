@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alefzero.padlbridge.cache.PBCacheService;
+import com.alefzero.padlbridge.config.model.OperationalActions;
 import com.alefzero.padlbridge.util.PInfo;
 
 public class MariaDBCacheService extends PBCacheService {
@@ -140,7 +141,7 @@ public class MariaDBCacheService extends PBCacheService {
 		logger.trace(".cleanCacheTablesState ");
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_ALL_CACHE_STATUS_TO_UNSET));
-			ps.setInt(1, PBCacheService.CACHED_ENTRY_STATUS_UNSET);
+			ps.setInt(1, OperationalActions.UNSET.getOperationalValue());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Send throws as Unrecoverable
@@ -157,7 +158,7 @@ public class MariaDBCacheService extends PBCacheService {
 			int batchCount = 0;
 			while (allDistinctUids.hasNext()) {
 				String uid = allDistinctUids.next();
-				psCheckAsFound.setInt(1, CACHED_ENTRY_STATUS_EXISTS);
+				psCheckAsFound.setInt(1, OperationalActions.EXISTS.getOperationalValue());
 				psCheckAsFound.setString(2, sourceName);
 				psCheckAsFound.setString(3, uid);
 				psCheckAsFound.addBatch();
@@ -176,9 +177,9 @@ public class MariaDBCacheService extends PBCacheService {
 
 			PreparedStatement psCheckAsToDelete = conn
 					.prepareStatement(formatSQL(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE));
-			psCheckAsToDelete.setInt(1, CACHED_ENTRY_STATUS_DELETE);
+			psCheckAsToDelete.setInt(1, OperationalActions.DELETE.getOperationalValue());
 			psCheckAsToDelete.setString(2, sourceName);
-			psCheckAsToDelete.setInt(3, CACHED_ENTRY_STATUS_UNSET);
+			psCheckAsToDelete.setInt(3, OperationalActions.UNSET.getOperationalValue());
 			psCheckAsToDelete.executeUpdate();
 			psCheckAsToDelete.close();
 
@@ -194,7 +195,7 @@ public class MariaDBCacheService extends PBCacheService {
 		Deque<String> uids = new ArrayDeque<String>();
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_GET_ALL_DNs_BY_SOURCE_AND_STATUS));
-			ps.setInt(1, CACHED_ENTRY_STATUS_DELETE);
+			ps.setInt(1, OperationalActions.DELETE.getOperationalValue());
 			ps.setString(2, sourceName);
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
@@ -236,8 +237,8 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	public int getExpectedOperationFor(String sourceName, String uid, String hash) {
-		int _return = 0;
+	public OperationalActions getExpectedOperationFor(String sourceName, String uid, String hash) {
+		OperationalActions _return = null;
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_SELECT_GET_HASH_FROM_CACHE));
 			ps.setString(1, Objects.requireNonNull(sourceName));
@@ -246,10 +247,10 @@ public class MariaDBCacheService extends PBCacheService {
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				_return = Objects.requireNonNull(hash).equals(rs.getString(1))
-						? PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING
-						: PBCacheService.CACHED_ENTRY_STATUS_UPDATE;
+						? OperationalActions.DO_NOTHING
+						: OperationalActions.UPDATE;
 			} else {
-				_return = PBCacheService.CACHED_ENTRY_STATUS_ADD;
+				_return = OperationalActions.ADD;
 			}
 			rs.close();
 			ps.close();
@@ -262,19 +263,19 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	public void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn, String hash) {
+	public void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid, String dn, String hash) {
 		logger.trace(
 				".updateCacheWithData int cacheOperationValue={}, String sourceName={}, String uid={}, String dn={}, String hash={}",
-				cacheOperationValue, sourceName, uid, dn, hash);
+				operationalAction, sourceName, uid, dn, hash);
 		try (Connection conn = bds.getConnection()) {
-			if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_UPDATE) {
+			if (operationalAction == OperationalActions.UPDATE) {
 				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_HASH_VALUE_OF));
 				ps.setString(1, Objects.requireNonNull(hash));
 				ps.setString(2, Objects.requireNonNull(sourceName));
 				ps.setString(3, Objects.requireNonNull(uid));
 				ps.executeUpdate();
 				ps.close();
-			} else if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_ADD) {
+			} else if (operationalAction == OperationalActions.ADD) {
 				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_INSERT_ENTRY_TO_CACHE));
 				ps.setString(1, Objects.requireNonNull(sourceName));
 				ps.setString(2, Objects.requireNonNull(uid));

@@ -9,7 +9,7 @@ public abstract class SourceConfig implements PBGenericConfig {
 	private String type;
 	private String name;
 	private String dn;
-	private String defaultOperation;
+	private OperationalActions defaultOperation;
 
 	public String getType() {
 		return type;
@@ -35,18 +35,19 @@ public abstract class SourceConfig implements PBGenericConfig {
 		this.dn = dn;
 	}
 
-	public String getDefaultOperation() {
+	public OperationalActions getDefaultOperation() {
 		return defaultOperation;
 	}
 
-	public void setDefaultOperation(String defaultOperation) {
+	public void setDefaultOperation(OperationalActions defaultOperation) {
 		this.defaultOperation = defaultOperation;
 	}
 
 	@Override
 	public void checkConfiguration() {
 		Objects.requireNonNull(type);
-		Objects.requireNonNull(name, PInfo.msg("config.required-attribute-not-found", "name", "source", this.getName()));
+		Objects.requireNonNull(name,
+				PInfo.msg("config.required-attribute-not-found", "name", "source", this.getName()));
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alefzero.padlbridge.cache.PBCacheService;
+import com.alefzero.padlbridge.config.model.OperationalActions;
 import com.alefzero.padlbridge.core.model.DataEntry;
 import com.alefzero.padlbridge.sources.PBSourceService;
 import com.alefzero.padlbridge.targets.PBTargetService;
@@ -57,23 +58,36 @@ public class PBOrchestrator {
 
 				Iterator<DataEntry> iterator = source.getAllEntries();
 				while (iterator.hasNext()) {
+
 					DataEntry dataEntry = iterator.next();
-					int operation = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
+					OperationalActions action = cache.getExpectedOperationFor(source.getName(), dataEntry.getUid(),
 							dataEntry.getHash());
-					if (PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING == operation) {
-						// DO NOTHING
-					} else if (PBCacheService.CACHED_ENTRY_STATUS_UPDATE == operation
-							|| "update".equalsIgnoreCase(source.getConfig().getDefaultOperation())) {
-						target.modify(dataEntry.getEntry());
-						cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
-								dataEntry.getEntry().getDN(), dataEntry.getHash());
-					} else if (PBCacheService.CACHED_ENTRY_STATUS_ADD == operation) {
+
+					switch (action) {
+					case UNSET:
+					case EXISTS:
+					case DO_NOTHING:
+						break;
+					case REPLACE:
+						// REPLACE = DELETE + ADD
+						target.delete(dataEntry.getEntry());
+					case ADD:
 						target.add(dataEntry.getEntry());
-						cache.updateCacheWithData(operation, source.getName(), dataEntry.getUid(),
+						cache.updateCacheWithData(action, source.getName(), dataEntry.getUid(),
 								dataEntry.getEntry().getDN(), dataEntry.getHash());
-					} else {
-						logger.error("Error processing data: operation {} for DN: {}", operation,
+						break;
+					case UPDATE:
+						target.modify(dataEntry.getEntry());
+						cache.updateCacheWithData(action, source.getName(), dataEntry.getUid(),
+								dataEntry.getEntry().getDN(), dataEntry.getHash());
+						break;
+					case DELETE:
+						// treated by prior loop phase
+						break;
+					default:
+						logger.error("Error processing data: operation {} for DN: {}", action,
 								dataEntry.getEntry().getDN());
+						break;
 					}
 				}
 			}

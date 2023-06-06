@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
+import com.alefzero.padlbridge.config.model.OperationalActions;
 import com.alefzero.padlbridge.config.model.SourceConfig;
 import com.alefzero.padlbridge.util.PInfo;
 
@@ -37,10 +38,12 @@ public class DBSourceConfig extends SourceConfig {
 		Objects.requireNonNull(query,
 				PInfo.msg("config.required-attribute-not-found", "query", "source", this.getName()));
 		Objects.requireNonNull(uid, PInfo.msg("config.required-attribute-not-found", "uid", "source", this.getName()));
-		if (!"update".equalsIgnoreCase(getDefaultOperation())) {
+
+		if (OperationalActions.UPDATE != getDefaultOperation()) {
 			Objects.requireNonNull(objectClasses,
 					PInfo.msg("config.required-attribute-not-found", "objectClasses", "source", this.getName()));
 		}
+
 	}
 
 	public Map<String, String> getLdapToDBMap() {
