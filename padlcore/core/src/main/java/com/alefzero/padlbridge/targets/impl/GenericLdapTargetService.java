@@ -19,6 +19,7 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.Modification;
 import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.ModifyRequest;
+import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
@@ -29,6 +30,16 @@ public class GenericLdapTargetService extends PBTargetService {
 	private LDAPConnectionPool pool = null;
 	private GenericLdapTargetConfig config = null;
 
+	private LDAPConnection getConnection() throws LDAPException {
+		if (pool == null) {
+			prepare();
+			return pool.getConnection();
+		} else {
+			throw new LDAPException(ResultCode.CONNECT_ERROR);
+		}
+
+	}
+
 	@Override
 	public void prepare() {
 		config = (GenericLdapTargetConfig) super.getConfig();
@@ -37,13 +48,14 @@ public class GenericLdapTargetService extends PBTargetService {
 					config.getAdminPassword());
 			pool = new LDAPConnectionPool(conn, 10);
 		} catch (LDAPException e) {
+			e.printStackTrace();
 			logger.error("Error creating target LDAP connections.", e);
 		}
 	}
 
 	@Override
 	public void add(Entry entry) {
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			conn.add(entry);
 		} catch (LDAPException e) {
 			if (e.getResultCode().intValue() == LDAPCodes.ENTRY_ALREADY_EXISTS) {
@@ -57,7 +69,7 @@ public class GenericLdapTargetService extends PBTargetService {
 
 	@Override
 	public void modify(Entry entry) {
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			List<Modification> mods = new ArrayList<Modification>();
 			for (Attribute attribute : entry.getAttributes()) {
 				mods.add(new Modification(ModificationType.REPLACE, attribute.getName(), attribute.getValues()));
@@ -84,7 +96,7 @@ public class GenericLdapTargetService extends PBTargetService {
 	@Override
 	public void addAll(Iterator<Entry> entriesToAddFrom) {
 		Entry item = null;
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			while (entriesToAddFrom.hasNext()) {
 				item = entriesToAddFrom.next();
 				try {
@@ -107,7 +119,7 @@ public class GenericLdapTargetService extends PBTargetService {
 	public Deque<String> deleteAll(Iterator<String> listOfDNsToDelete) {
 		Deque<String> _return = new ArrayDeque<String>();
 		String item = null;
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			while (listOfDNsToDelete.hasNext()) {
 				item = listOfDNsToDelete.next();
 				try {
@@ -137,7 +149,7 @@ public class GenericLdapTargetService extends PBTargetService {
 	}
 
 	public void deleteTree(String dn) {
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			SearchResult result = conn.search(dn, SearchScope.ONE, "(objectClass=*)", "dn");
 			for (SearchResultEntry item : result.getSearchEntries()) {
 				String todel = item.getDN();

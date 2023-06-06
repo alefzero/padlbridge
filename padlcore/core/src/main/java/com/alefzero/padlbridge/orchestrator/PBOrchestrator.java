@@ -64,8 +64,8 @@ public class PBOrchestrator {
 				while (iterator.hasNext()) {
 
 					DataEntry dataEntry = iterator.next();
-					OperationalActions action = cache.getExpectedOperationFor(cacheDefaultAddOperation, source.getName(),
-							dataEntry.getUid(), dataEntry.getHash());
+					OperationalActions action = cache.getExpectedOperationFor(cacheDefaultAddOperation,
+							source.getName(), dataEntry.getUid(), dataEntry.getHash());
 
 					switch (action) {
 					case UNSET:
@@ -104,13 +104,6 @@ public class PBOrchestrator {
 		logger.info(PInfo.msg("orchestrator.waiting-next-process"));
 
 	}
-	
-	
-	public static void main(String[] args) {
-		System.out.println(OperationalActions.valueOf("update"));
-	}
-	
-	
 }
 
 // Note
@@ -138,6 +131,3 @@ public class PBOrchestrator {
 //				dataEntry.getEntry().getDN());
 //	}
 //});
-
-
-
