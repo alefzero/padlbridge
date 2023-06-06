@@ -87,7 +87,7 @@ public class PBOrchestrator {
 						// treated by prior loop phase
 						break;
 					case UNSET:
-						logger.error("Deafult operation action for source {} is unset ({}).", source.getName(),
+						logger.error("Default operation action for source {} is unset ({}).", source.getName(),
 								sourceDefaultOperation);
 						break;
 					default:
