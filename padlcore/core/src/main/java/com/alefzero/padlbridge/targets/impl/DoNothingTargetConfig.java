@@ -4,5 +4,10 @@ import com.alefzero.padlbridge.config.model.TargetConfig;
 
 public class DoNothingTargetConfig extends TargetConfig {
 
+	@Override
+	public void checkConfiguration() {
+		super.checkConfiguration();
+	}
+
 
 }

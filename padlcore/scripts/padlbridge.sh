@@ -19,7 +19,7 @@ check_config_file() {
     then
         echo "Variable PADL_CONFIG_FILE is not set."
     else
-        CONFIG_FILE="padlcore"
+        CONFIG_FILE="${PADLBRIDGE_HOME}/conf/padlbridge.yaml"
         echo "Trying to default configuration file provided by PADL_CONFIG_FILE (${PADL_CONFIG_FILE}) variable."
     fi
 
@@ -35,8 +35,9 @@ check_config_file() {
 
 check_config_file
 echo "Using configuration file located at ${CONFIG_FILE}."
-nohup ${PADLBRIDGE_HOME}/core/bin/core run ${CONFIG_FILE} 2>&1 1> >(tee) &
-PADL_PID=$$
+cd ${PADLBRIDGE_HOME}
+${PADLBRIDGE_HOME}/core/bin/core run ${CONFIG_FILE} 2>&1 1> >(tee) &
+PADL_PID=$!
 wait $PADL_PID
 
 

@@ -1,7 +1,16 @@
 package com.alefzero.padlbridge.cache.impl;
 
-import com.alefzero.padlbridge.config.model.CacheConfig;
+import java.util.Objects;
 
+import com.alefzero.padlbridge.config.model.CacheConfig;
+import com.alefzero.padlbridge.util.PInfo;
+
+/**
+ * Represents YAML configuration for the MariaDB based cache
+ * 
+ * @author xandecelo
+ *
+ */
 public class MariaDBCacheConfig extends CacheConfig {
 
 	private String jdbcURL;
@@ -30,6 +39,11 @@ public class MariaDBCacheConfig extends CacheConfig {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Override
+	public void checkConfiguration() {
+		Objects.requireNonNull(jdbcURL, PInfo.msg("config.required-attribute-not-found", "jdbcURL", "cache", "cache"));
 	}
 
 }

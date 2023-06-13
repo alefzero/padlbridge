@@ -8,8 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public abstract class DBDialectHelper {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+public abstract class DBDialectHelper {
+	protected static final Logger logger = LogManager.getLogger();
+	
 	public static final String PADL_HASH_COLUMN_NAME = "padl_hash_id";
 	private static final String PADL_HASH_SQL_FORMAT = "select %s %s, a.* from (%s) a order by %s";
 	private static final String PADL_UID_SQL_FORMAT = "select %s from (%s) a order by %s";
@@ -52,6 +56,7 @@ public abstract class DBDialectHelper {
 	}
 
 	public Deque<String> getDBColumnsOfAttributes() {
+		logger.trace(".getDBColumnsOfAttributes result: {}", attributeColumns);
 		return attributeColumns;
 	}
 

@@ -3,7 +3,7 @@ package com.alefzero.padlbridge.config.model;
 public class InstanceConfig {
 
 	private String lang;
-	private String version;
+	private String version = "no-version";
 	private String instanceId;
 
 	public String getLang() {

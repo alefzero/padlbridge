@@ -9,8 +9,10 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.alefzero.padlbridge.exceptions.PadlRecoverableException;
 import com.alefzero.padlbridge.targets.LDAPCodes;
 import com.alefzero.padlbridge.targets.PBTargetService;
+import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Entry;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionPool;
@@ -28,6 +30,19 @@ public class GenericLdapTargetService extends PBTargetService {
 	private LDAPConnectionPool pool = null;
 	private GenericLdapTargetConfig config = null;
 
+	private LDAPConnection getConnection() throws PadlRecoverableException {
+		if (pool == null) {
+			prepare();
+		}
+		try {
+			return pool.getConnection();
+		} catch (LDAPException e) {
+			e.printStackTrace();
+			throw new PadlRecoverableException("Cannot connect to target LDAP.");
+		}
+
+	}
+
 	@Override
 	public void prepare() {
 		config = (GenericLdapTargetConfig) super.getConfig();
@@ -36,17 +51,18 @@ public class GenericLdapTargetService extends PBTargetService {
 					config.getAdminPassword());
 			pool = new LDAPConnectionPool(conn, 10);
 		} catch (LDAPException e) {
+			e.printStackTrace();
 			logger.error("Error creating target LDAP connections.", e);
 		}
 	}
 
 	@Override
 	public void add(Entry entry) {
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			conn.add(entry);
 		} catch (LDAPException e) {
 			if (e.getResultCode().intValue() == LDAPCodes.ENTRY_ALREADY_EXISTS) {
-				logger.error("dn {} already exists at LDAP. Add will be ignored.", entry);
+				logger.error("LDAP entry with dn {} already exists at LDAP. Add will be ignored.", entry);
 			} else {
 				logger.error("Error processing target LDAP operation - dn {}. {}  {}", entry, e.getResultString(),
 						e.getResultCode());
@@ -56,11 +72,11 @@ public class GenericLdapTargetService extends PBTargetService {
 
 	@Override
 	public void modify(Entry entry) {
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			List<Modification> mods = new ArrayList<Modification>();
-			entry.getAttributes().forEach(attribute -> {
+			for (Attribute attribute : entry.getAttributes()) {
 				mods.add(new Modification(ModificationType.REPLACE, attribute.getName(), attribute.getValues()));
-			});
+			}
 			ModifyRequest request = new ModifyRequest(entry.getDN(), mods);
 			conn.modify(request);
 		} catch (LDAPException e) {
@@ -83,14 +99,14 @@ public class GenericLdapTargetService extends PBTargetService {
 	@Override
 	public void addAll(Iterator<Entry> entriesToAddFrom) {
 		Entry item = null;
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			while (entriesToAddFrom.hasNext()) {
 				item = entriesToAddFrom.next();
 				try {
 					conn.add(item);
 				} catch (LDAPException e) {
 					if (e.getResultCode().intValue() == LDAPCodes.ENTRY_ALREADY_EXISTS) {
-						logger.error("dn {} already exists at LDAP. Add will be ignored.", item);
+						logger.error("LDAP entry dn {} already exists at LDAP. Add will be ignored.", item);
 					} else {
 						throw e;
 					}
@@ -106,7 +122,7 @@ public class GenericLdapTargetService extends PBTargetService {
 	public Deque<String> deleteAll(Iterator<String> listOfDNsToDelete) {
 		Deque<String> _return = new ArrayDeque<String>();
 		String item = null;
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			while (listOfDNsToDelete.hasNext()) {
 				item = listOfDNsToDelete.next();
 				try {
@@ -136,7 +152,7 @@ public class GenericLdapTargetService extends PBTargetService {
 	}
 
 	public void deleteTree(String dn) {
-		try (LDAPConnection conn = pool.getConnection()) {
+		try (LDAPConnection conn = this.getConnection()) {
 			SearchResult result = conn.search(dn, SearchScope.ONE, "(objectClass=*)", "dn");
 			for (SearchResultEntry item : result.getSearchEntries()) {
 				String todel = item.getDN();
@@ -155,9 +171,10 @@ public class GenericLdapTargetService extends PBTargetService {
 			conn.delete(dn);
 
 		} catch (LDAPException e) {
-			e.printStackTrace();
+			if (e.getResultCode().intValue() == LDAPCodes.NO_SUCH_OBJECT) {
+				logger.trace("Delete request couldn't find DN {} at the target LDAP.", dn);
+			}
 		}
 	}
-
 
 }

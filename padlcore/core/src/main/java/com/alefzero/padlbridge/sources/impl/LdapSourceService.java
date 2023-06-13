@@ -35,9 +35,8 @@ public class LdapSourceService extends PBSourceService {
 
 	@Override
 	public Iterator<DataEntry> getAllEntries() {
-		try (LDAPConnection conn = pool.getConnection()) {
-			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUB, "(objectClass=*)",
-					"*");
+		try (LDAPConnection conn = getConnection()) {
+			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUB, "(objectClass=*)", "*");
 			return new EntryIterator(result);
 		} catch (LDAPException e) {
 			e.printStackTrace();
@@ -45,12 +44,12 @@ public class LdapSourceService extends PBSourceService {
 		}
 	}
 
+
 	@Override
 	public Iterator<String> getAllUids() {
 		Deque<String> dnItems = new ArrayDeque<String>();
-		try (LDAPConnection conn = pool.getConnection()) {
-			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUB, "(objectClass=*)",
-					"dn");
+		try (LDAPConnection conn = getConnection()) {
+			SearchResult result = conn.search(config.getBaseDN(), SearchScope.SUB, "(objectClass=*)", "dn");
 			result.getSearchEntries().forEach(entry -> {
 				dnItems.add(entry.getDN());
 			});
@@ -60,6 +59,13 @@ public class LdapSourceService extends PBSourceService {
 			e.printStackTrace();
 		}
 		return dnItems.iterator();
+	}
+	
+	private LDAPConnection getConnection() throws LDAPException {
+		if (pool == null ) {
+			prepare();
+		}
+		return pool.getConnection();
 	}
 
 	class EntryIterator implements Iterator<DataEntry> {

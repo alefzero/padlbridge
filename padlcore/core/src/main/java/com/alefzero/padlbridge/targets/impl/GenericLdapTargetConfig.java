@@ -1,15 +1,25 @@
 package com.alefzero.padlbridge.targets.impl;
 
+import java.util.Objects;
+
 import com.alefzero.padlbridge.config.model.TargetConfig;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class GenericLdapTargetConfig extends TargetConfig {
 
 	private String host;
-	private int port = 10389;
+	private int port = 389;
 	private String useTLS;
 	private String rootDN;
 	private String adminPassword;
 	private String adminUser;
+
+	@Override
+	public void checkConfiguration() {
+		super.checkConfiguration();
+		Objects.requireNonNull(host, PInfo.msg("config.required-attribute-not-found", "host", "target", "target"));
+		Objects.requireNonNull(rootDN, PInfo.msg("config.required-attribute-not-found", "rootDN", "target", "target"));
+	}
 
 	public String getHost() {
 		return host;

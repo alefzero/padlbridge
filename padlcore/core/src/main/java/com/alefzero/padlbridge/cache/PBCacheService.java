@@ -5,19 +5,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.alefzero.padlbridge.config.model.CacheConfig;
+import com.alefzero.padlbridge.config.model.OperationalActions;
 import com.alefzero.padlbridge.exceptions.PadlRecoverableException;
 import com.alefzero.padlbridge.orchestrator.PBGenericService;
 import com.alefzero.padlbridge.targets.PBTargetService;
+import com.alefzero.padlbridge.util.PInfo;
 
 public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 
-	public static final int CACHED_ENTRY_STATUS_UNSET = 0;
-	public static final int CACHED_ENTRY_STATUS_EXISTS = 1;
-	public static final int CACHED_ENTRY_STATUS_DELETE = 2;
-	public static final int CACHED_ENTRY_STATUS_ADD = 3;
-	public static final int CACHED_ENTRY_STATUS_UPDATE = 4;
-	public static final int CACHED_ENTRY_STATUS_DO_NOTHING = 5;
+	protected static final Logger logger = LogManager.getLogger();
 
 	private String instanceName = "default";
 
@@ -28,6 +28,7 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * @return
 	 */
 	public String getInstanceName() {
+		logger.trace(PInfo.log("cache.get-instance"));
 		return instanceName;
 	}
 
@@ -38,15 +39,13 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * @param instanceName
 	 */
 	public void setInstanceName(String instanceName) {
+		logger.trace(".setInstanceName [{}]", instanceName);
+
 		if (Objects.requireNonNull(instanceName).matches("[a-zA-Z0-9_]*") && instanceName.length() <= 30
 				&& !instanceName.isBlank()) {
 			this.instanceName = instanceName;
 		} else {
-			throw new PadlRecoverableException(String.format("""
-					Instance name should contain only letters, \
-					numbers and _ symbol and the length \
-					should be between 1 and 30 characters maximum.
-					instanceName = [%s] is invalid.""", instanceName));
+			throw new PadlRecoverableException(PInfo.msg("cache.invalid-instance-name", instanceName));
 		}
 	}
 
@@ -93,12 +92,15 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * Check and return the operation to be executed for this uid entry at the
 	 * target, based on source data.
 	 * 
-	 * @param soourceName
+	 * @param defaultAddOperation when a entry is already found at the target,
+	 *                            should just update or replace it completely
+	 * @param sourceName
 	 * @param uid
 	 * @param hash
 	 * @return
 	 */
-	public abstract int getExpectedOperationFor(String sourceName, String uid, String hash);
+	public abstract OperationalActions getExpectedOperationFor(OperationalActions defaultAddOperation,
+			String sourceName, String uid, String hash);
 
 	/**
 	 * Update hash entry for this cache. Used to sync the result operation after
@@ -111,7 +113,16 @@ public abstract class PBCacheService extends PBGenericService<CacheConfig> {
 	 * @param hash
 	 * @return
 	 */
-	public abstract void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn,
-			String hash);
+	public abstract void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid,
+			String dn, String hash);
+
+	/**
+	 * 
+	 * @param operationalActions
+	 * @return
+	 */
+	public OperationalActions getBehaviourForAddingNewEntries(OperationalActions operationalActions) {
+		return operationalActions == OperationalActions.REPLACE ? OperationalActions.REPLACE : OperationalActions.ADD;
+	}
 
 }

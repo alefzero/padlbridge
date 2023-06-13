@@ -10,14 +10,16 @@ import java.util.Deque;
 import java.util.Iterator;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.alefzero.padlbridge.core.model.DataEntry;
 import com.alefzero.padlbridge.exceptions.PadlUnrecoverableError;
 import com.alefzero.padlbridge.sources.PBSourceService;
 import com.alefzero.padlbridge.sources.dialects.DBDialectHelper;
-import com.unboundid.ldap.sdk.Entry;
 
 public class DBSourceService extends PBSourceService {
+	protected static final Logger logger = LogManager.getLogger();
 
 	private DBSourceConfig config = null;
 	private BasicDataSource bds = null;
@@ -36,11 +38,8 @@ public class DBSourceService extends PBSourceService {
 			bds.setCacheState(false);
 		}
 		try (Connection conn = bds.getConnection()) {
-			helper = (DBDialectHelper) Class.forName(config.getDialect()).getDeclaredConstructor()
-					.newInstance();
-
+			helper = (DBDialectHelper) Class.forName(config.getDialect()).getDeclaredConstructor().newInstance();
 			helper.prepare(conn, config.getQuery(), config.getUid());
-
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			logger.error("Dialect class not found: {}", config.getDialect());
@@ -53,110 +52,19 @@ public class DBSourceService extends PBSourceService {
 
 	@Override
 	public Iterator<DataEntry> getAllEntries() {
-		try (Connection conn = bds.getConnection()) {
-			return new EntryIterator(conn, helper.getDBColumnsOfAttributes());
+		try {
+			return new DBSourceEntryIterator(bds.getConnection(), config, helper);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new PadlUnrecoverableError(e);
+		} finally {
+			logger.trace(".getAllEntries returning EntryIterator for {}.", config.getName());
 		}
-	}
-
-	private class EntryIterator implements Iterator<DataEntry> {
-		private Connection conn;
-		private PreparedStatement ps;
-		private DataEntry currentEntry;
-		private ResultSet rs;
-		private Deque<String> dbColumns;
-
-		private EntryIterator(Connection conn, Deque<String> dbColumns) throws SQLException {
-			// TODO: change to LDAP columns so datamap can map to more than 1 column
-			this.conn = conn;
-			this.dbColumns = dbColumns;
-			prepareIterator();
-		}
-
-		private void prepareIterator() throws SQLException {
-			String normalizedQuery = helper.getSQLWithHash();
-			ps = conn.prepareStatement(normalizedQuery);
-			rs = ps.executeQuery();
-
-		}
-
-		private DataEntry nextEntry = null;
-
-		@Override
-		public boolean hasNext() {
-			boolean hasNext = false;
-			if (isLineAlreadyFetchedFromDB()) {
-				currentEntry = nextEntry;
-				nextEntry = null;
-				hasNext = true;
-			} else {
-				try {
-					hasNext = rs.next();
-					if (hasNext) {
-						currentEntry = new DataEntry(rs.getString(config.getUid()), createLdapEntryFrom(rs),
-								rs.getString(DBDialectHelper.PADL_HASH_COLUMN_NAME));
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
-				}
-			}
-
-			if (hasNext && didConfigHasMultiValuedAttributes()) {
-				try {
-					while (rs.next()) {
-						if (isNextLineFromSourceAnotherEntry(rs)) {
-							nextEntry = new DataEntry(rs.getString(config.getUid()), createLdapEntryFrom(rs),
-									rs.getString(DBDialectHelper.PADL_HASH_COLUMN_NAME));
-							break;
-						} else {
-							for (String multiValuedAttributeName : config.getMultiValueAttributes()) {
-								currentEntry.getEntry().addAttribute(multiValuedAttributeName,
-										rs.getString(config.getDBAttributeNameFor(multiValuedAttributeName)));
-							}
-						}
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-					logger.error("Cannot read more data. Reason: ", e.getLocalizedMessage());
-				}
-			}
-
-			return hasNext;
-		}
-
-		private boolean didConfigHasMultiValuedAttributes() {
-			return config.getMultiValueAttributes().size() > 0;
-		}
-
-		private boolean isLineAlreadyFetchedFromDB() {
-			return nextEntry != null;
-		}
-
-		public boolean isNextLineFromSourceAnotherEntry(ResultSet rs) throws SQLException {
-			return !currentEntry.getUid().equals(rs.getString(config.getUid()));
-		}
-
-		private Entry createLdapEntryFrom(ResultSet rs) throws SQLException {
-			Entry entry = new Entry(String.format(config.getDn(), rs.getString(config.getUid())));
-			for (String dbColumn : dbColumns) {
-				entry.addAttribute(config.getLdapAttributeNameFor(dbColumn), rs.getString(dbColumn));
-			}
-			entry.addAttribute("objectClass", config.getObjectClasses());
-			return entry;
-		}
-
-		@Override
-		public DataEntry next() {
-			return currentEntry;
-		}
-
 	}
 
 	@Override
 	public Iterator<String> getAllUids() {
+		logger.trace(".getAllUids");
 		Deque<String> uids = new ArrayDeque<String>();
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(helper.getSQLForAllUids());

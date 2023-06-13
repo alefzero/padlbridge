@@ -14,9 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alefzero.padlbridge.cache.PBCacheService;
-import com.alefzero.padlbridge.core.model.DataEntry;
-import com.unboundid.ldap.sdk.Entry;
-import com.unboundid.ldif.LDIFException;
+import com.alefzero.padlbridge.config.model.OperationalActions;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class MariaDBCacheService extends PBCacheService {
 
@@ -126,7 +125,10 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	public String formatSQL(String sqlCreateCurrentCacheTable) {
-		return sqlCreateCurrentCacheTable.replace("$INSTANCE_NAME$", "cache_data_" + getInstanceName());
+		logger.trace(".formatSQL [{}}] + instanceName: [{}]", sqlCreateCurrentCacheTable, getInstanceName());
+		String _return = sqlCreateCurrentCacheTable.replace("$INSTANCE_NAME$", "cache_data_" + getInstanceName());
+		logger.trace(".formatSQL [return: {}]", _return);
+		return _return;
 	}
 
 	private void createDBStructure(Connection conn) throws SQLException {
@@ -139,7 +141,7 @@ public class MariaDBCacheService extends PBCacheService {
 		logger.trace(".cleanCacheTablesState ");
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_ALL_CACHE_STATUS_TO_UNSET));
-			ps.setInt(1, PBCacheService.CACHED_ENTRY_STATUS_UNSET);
+			ps.setInt(1, OperationalActions.UNSET.getOperationalValue());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Send throws as Unrecoverable
@@ -151,16 +153,18 @@ public class MariaDBCacheService extends PBCacheService {
 	public void syncUidsFromSource(String sourceName, Iterator<String> allDistinctUids) {
 		logger.trace(".setEntryUidAsFoundFor ");
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement psCheckAsFound = conn.prepareStatement(formatSQL(SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID));
+			PreparedStatement psCheckAsFound = conn
+					.prepareStatement(formatSQL(SQL_UPDATE_CACHE_STATUS_BY_SOURCE_AND_UID));
 			int batchCount = 0;
 			while (allDistinctUids.hasNext()) {
 				String uid = allDistinctUids.next();
-				psCheckAsFound.setInt(1, CACHED_ENTRY_STATUS_EXISTS);
+				psCheckAsFound.setInt(1, OperationalActions.EXISTS.getOperationalValue());
 				psCheckAsFound.setString(2, sourceName);
 				psCheckAsFound.setString(3, uid);
 				psCheckAsFound.addBatch();
 
 				if (++batchCount > BATCH_COUNT) {
+					logger.trace(PInfo.log("cache.batch-commit-message"));
 					psCheckAsFound.executeBatch();
 					batchCount = 0;
 				}
@@ -171,10 +175,11 @@ public class MariaDBCacheService extends PBCacheService {
 			}
 			psCheckAsFound.close();
 
-			PreparedStatement psCheckAsToDelete = conn.prepareStatement(formatSQL(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE));
-			psCheckAsToDelete.setInt(1, CACHED_ENTRY_STATUS_DELETE);
+			PreparedStatement psCheckAsToDelete = conn
+					.prepareStatement(formatSQL(SQL_UPDATE_CHANGE_CACHE_STATUS_FOR_SOURCE));
+			psCheckAsToDelete.setInt(1, OperationalActions.DELETE.getOperationalValue());
 			psCheckAsToDelete.setString(2, sourceName);
-			psCheckAsToDelete.setInt(3, CACHED_ENTRY_STATUS_UNSET);
+			psCheckAsToDelete.setInt(3, OperationalActions.UNSET.getOperationalValue());
 			psCheckAsToDelete.executeUpdate();
 			psCheckAsToDelete.close();
 
@@ -190,7 +195,7 @@ public class MariaDBCacheService extends PBCacheService {
 		Deque<String> uids = new ArrayDeque<String>();
 		try (Connection conn = bds.getConnection()) {
 			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_GET_ALL_DNs_BY_SOURCE_AND_STATUS));
-			ps.setInt(1, CACHED_ENTRY_STATUS_DELETE);
+			ps.setInt(1, OperationalActions.DELETE.getOperationalValue());
 			ps.setString(2, sourceName);
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
@@ -209,7 +214,7 @@ public class MariaDBCacheService extends PBCacheService {
 	public void removeFromCacheByDN(String sourceName, Deque<String> dnItems) {
 		logger.trace(".removeDNFromCache ");
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement ps = conn.prepareStatement(SQL_DELETE_DN_FROM_SOURCE);
+			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_DELETE_DN_FROM_SOURCE));
 			Iterator<String> iterator = dnItems.iterator();
 			int count = 0;
 			while (iterator.hasNext()) {
@@ -232,20 +237,19 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	public int getExpectedOperationFor(String sourceName, String uid, String hash) {
-		int _return = 0;
+	public OperationalActions getExpectedOperationFor(OperationalActions defaultAddOperation, String sourceName,
+			String uid, String hash) {
+		OperationalActions _return = defaultAddOperation;
+
 		try (Connection conn = bds.getConnection()) {
-			PreparedStatement ps = conn.prepareStatement(SQL_SELECT_GET_HASH_FROM_CACHE);
+			PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_SELECT_GET_HASH_FROM_CACHE));
 			ps.setString(1, Objects.requireNonNull(sourceName));
 			ps.setString(2, Objects.requireNonNull(uid));
 
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
-				_return = Objects.requireNonNull(hash).equals(rs.getString(1))
-						? PBCacheService.CACHED_ENTRY_STATUS_DO_NOTHING
-						: PBCacheService.CACHED_ENTRY_STATUS_UPDATE;
-			} else {
-				_return = PBCacheService.CACHED_ENTRY_STATUS_ADD;
+				_return = Objects.requireNonNull(hash).equals(rs.getString(1)) ? OperationalActions.DO_NOTHING
+						: OperationalActions.UPDATE;
 			}
 			rs.close();
 			ps.close();
@@ -258,20 +262,21 @@ public class MariaDBCacheService extends PBCacheService {
 	}
 
 	@Override
-	public void updateCacheWithData(int cacheOperationValue, String sourceName, String uid, String dn, String hash) {
+	public void updateCacheWithData(OperationalActions operationalAction, String sourceName, String uid, String dn,
+			String hash) {
 		logger.trace(
 				".updateCacheWithData int cacheOperationValue={}, String sourceName={}, String uid={}, String dn={}, String hash={}",
-				cacheOperationValue, sourceName, uid, dn, hash);
+				operationalAction, sourceName, uid, dn, hash);
 		try (Connection conn = bds.getConnection()) {
-			if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_UPDATE) {
-				PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_HASH_VALUE_OF);
+			if (operationalAction == OperationalActions.UPDATE) {
+				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_HASH_VALUE_OF));
 				ps.setString(1, Objects.requireNonNull(hash));
 				ps.setString(2, Objects.requireNonNull(sourceName));
 				ps.setString(3, Objects.requireNonNull(uid));
 				ps.executeUpdate();
 				ps.close();
-			} else if (cacheOperationValue == PBCacheService.CACHED_ENTRY_STATUS_ADD) {
-				PreparedStatement ps = conn.prepareStatement(SQL_INSERT_ENTRY_TO_CACHE);
+			} else if (operationalAction == OperationalActions.ADD) {
+				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_INSERT_ENTRY_TO_CACHE));
 				ps.setString(1, Objects.requireNonNull(sourceName));
 				ps.setString(2, Objects.requireNonNull(uid));
 				ps.setString(3, Objects.requireNonNull(dn));
@@ -284,119 +289,4 @@ public class MariaDBCacheService extends PBCacheService {
 			e.printStackTrace();
 		}
 	}
-
-	/// -------------------------------------------------------------------------------
-	/// -------------------------------------------------------------------------------
-	/// -------------------------------------------------------------------------------
-
-	protected void initializeDatasource() {
-		// TODO remove this example
-
-		logger.trace(".initializeResources ");
-
-		if (bds == null) {
-			logger.debug("Loading cache datasource.");
-			config = (MariaDBCacheConfig) super.getConfig();
-			bds = new BasicDataSource();
-			bds.setUrl(config.getJdbcURL());
-			bds.setUsername(config.getUsername());
-			bds.setPassword(config.getPassword());
-			bds.setMaxTotal(100);
-			bds.setMinIdle(10);
-			bds.setCacheState(false);
-
-			try (Connection conn = bds.getConnection()) {
-				conn.prepareStatement(SQL_CREATE_CURRENT_CACHE_TABLE).execute();
-				conn.prepareStatement(CREATE_CURRENT_CACHE_INDEX).execute();
-
-				PreparedStatement psn = conn.prepareStatement("");
-				PreparedStatement psc = conn.prepareStatement("");
-
-				int counter = 0;
-				logger.trace(".initializeDatasource loading");
-				for (int i = 0; i < 10_000; i++) {
-					counter++;
-
-					// config_id, dn, uid, hash, removed_line_flag
-					int k = 1;
-					psc.setString(k++, "config1");
-					psc.setString(k++, "uid=user_" + i + ",ou=users,dc=alefzero,dc=com");
-					psc.setString(k++, "user_" + i);
-					psc.setString(k++, "hash_user_" + i);
-					psc.setBoolean(k++, false);
-					psc.addBatch();
-
-					if (counter % 9999 != 0) {
-						k = 1;
-						psn.setString(k++, "config1");
-						psn.setString(k++, "uid=user_" + i + ",ou=users,dc=alefzero,dc=com");
-						psn.setString(k++, "user_" + i);
-						psn.setString(k++, "hash_user_" + i);
-						psn.setBoolean(k++, false);
-						psn.addBatch();
-					}
-
-					if (counter > 1000) {
-						psn.executeBatch();
-						psc.executeBatch();
-						counter = 0;
-					}
-				}
-				psn.executeBatch();
-				psc.executeBatch();
-				logger.trace(".initializeResources loaded");
-
-				psn.close();
-				psc.close();
-			} catch (SQLException e) {
-				logger.error("Problem processing cache: ", e);
-			}
-		}
-	}
-
-	class MyIterEntry implements Iterator<DataEntry> {
-		// TODO remove this example
-
-		private Connection conn;
-		private ResultSet rs;
-		private PreparedStatement ps;
-		private DataEntry current = null;
-
-		MyIterEntry(Connection conn) throws SQLException {
-			this.conn = conn;
-			init();
-		}
-
-		private void init() throws SQLException {
-			ps = conn.prepareStatement(
-					"select distinct dn, uid, hash from $INSTANCE_NAME$ where config_id = ? and uid = ? order by 1,2");
-			ps.setString(1, "config1");
-			rs = ps.executeQuery();
-		}
-
-		@Override
-		public boolean hasNext() {
-			boolean _return = false;
-			try {
-				_return = rs.next();
-				if (_return) {
-					current = new DataEntry(rs.getString(2),
-							new Entry("dn: " + rs.getString(1), "objectClass: inetOrgPerson",
-									"cn: Sir " + rs.getString(2), "sn: SN " + rs.getString(2),
-									"uid: " + rs.getString(2)),
-							rs.getString(3));
-				}
-			} catch (SQLException | LDIFException e) {
-				e.printStackTrace();
-			}
-			return _return;
-		}
-
-		@Override
-		public DataEntry next() {
-			return current;
-		}
-
-	}
-
 }

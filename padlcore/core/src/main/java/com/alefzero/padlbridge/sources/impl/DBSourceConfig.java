@@ -8,23 +8,47 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
+import com.alefzero.padlbridge.config.model.OperationalActions;
 import com.alefzero.padlbridge.config.model.SourceConfig;
+import com.alefzero.padlbridge.util.PInfo;
 
 public class DBSourceConfig extends SourceConfig {
 
-	private Map<String, String> dbColToLDAP = null;
-	private Map<String, String> ldapColToDB = null;
-
-	private Deque<String> objectClassesAsAttributes = new ArrayDeque<String>();
 	private String jdbcURL;
-	private String username;
-	private String password;
+	private String username = "";
+	private String password = "";
 	private String query;
 	private String uid;
 	private Deque<String> datamap;
 	private Deque<String> multiValueAttributes = new ArrayDeque<String>();
 	private Deque<String> objectClasses;
 	private String dialect = "com.alefzero.padlbridge.sources.dialects.MariaDBDialectHelper";
+
+	private Map<String, String> dbColToLDAP = null;
+	private Map<String, String> ldapColToDB = null;
+	private Deque<String> objectClassesAsAttributes = new ArrayDeque<String>();
+
+	@Override
+	public void checkConfiguration() {
+		super.checkConfiguration();
+		Objects.requireNonNull(getDn(),
+				PInfo.msg("config.required-attribute-not-found", "dn", "source", this.getName()));
+		Objects.requireNonNull(jdbcURL,
+				PInfo.msg("config.required-attribute-not-found", "jdbcURL", "source", this.getName()));
+		Objects.requireNonNull(query,
+				PInfo.msg("config.required-attribute-not-found", "query", "source", this.getName()));
+		Objects.requireNonNull(uid, PInfo.msg("config.required-attribute-not-found", "uid", "source", this.getName()));
+
+		if (OperationalActions.UPDATE != getDefaultOperation()) {
+			Objects.requireNonNull(objectClasses,
+					PInfo.msg("config.required-attribute-not-found", "objectClasses", "source", this.getName()));
+		}
+
+	}
+
+	public Map<String, String> getLdapToDBMap() {
+		return ldapColToDB;
+	}
 
 	public String getJdbcURL() {
 		return jdbcURL;
@@ -63,7 +87,7 @@ public class DBSourceConfig extends SourceConfig {
 	}
 
 	public void setUid(String uid) {
-		this.uid = uid;
+		this.uid = Objects.requireNonNull(uid);
 	}
 
 	public Deque<String> getDatamap() {
@@ -114,9 +138,12 @@ public class DBSourceConfig extends SourceConfig {
 
 	@Override
 	public String toString() {
-		return "DBSourceConfig [jdbcURL=" + jdbcURL + ", username=" + username + ", password=" + password + ", query="
-				+ query + ", uid=" + uid + ", datamap=" + datamap + ", multiValueAttributes=" + multiValueAttributes
-				+ ", objectClasses=" + objectClasses + ", dialectHelperClass=" + dialect + "]";
+		return "DBSourceConfig [dbColToLDAP=" + dbColToLDAP + ", ldapColToDB=" + ldapColToDB
+				+ ", objectClassesAsAttributes=" + objectClassesAsAttributes + ", jdbcURL=" + jdbcURL + ", username="
+				+ username + ", password=" + password + ", query=" + query + ", uid=" + uid + ", datamap=" + datamap
+				+ ", multiValueAttributes=" + multiValueAttributes + ", objectClasses=" + objectClasses + ", dialect="
+				+ dialect + ", getType()=" + getType() + ", getName()=" + getName() + ", getDn()=" + getDn()
+				+ ", getDefaultOperation()=" + getDefaultOperation() + "]";
 	}
 
 	public String getLdapAttributeNameFor(String dbColumn) {

@@ -1,11 +1,15 @@
 package com.alefzero.padlbridge.config.model;
 
-public class SourceConfig implements PBGenericConfig {
+import java.util.Objects;
+
+import com.alefzero.padlbridge.util.PInfo;
+
+public abstract class SourceConfig implements PBGenericConfig {
 
 	private String type;
 	private String name;
 	private String dn;
-	private String defaultOperation;
+	private OperationalActions defaultOperation = OperationalActions.ADD;
 
 	public String getType() {
 		return type;
@@ -31,12 +35,23 @@ public class SourceConfig implements PBGenericConfig {
 		this.dn = dn;
 	}
 
-	public String getDefaultOperation() {
+	public OperationalActions getDefaultOperation() {
 		return defaultOperation;
 	}
 
-	public void setDefaultOperation(String defaultOperation) {
+	public void setDefaultOperation(OperationalActions defaultOperation) {
 		this.defaultOperation = defaultOperation;
+	}
+
+	public void setDefaultOperation(String defaultOperation) {
+		this.defaultOperation = OperationalActions.valueOf(Objects.requireNonNull(defaultOperation).toUpperCase());
+	}
+
+	@Override
+	public void checkConfiguration() {
+		Objects.requireNonNull(type);
+		Objects.requireNonNull(name,
+				PInfo.msg("config.required-attribute-not-found", "name", "source", this.getName()));
 	}
 
 	@Override
