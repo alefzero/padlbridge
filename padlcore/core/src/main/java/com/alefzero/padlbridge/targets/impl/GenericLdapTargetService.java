@@ -172,7 +172,7 @@ public class GenericLdapTargetService extends PBTargetService {
 
 		} catch (LDAPException e) {
 			if (e.getResultCode().intValue() == LDAPCodes.NO_SUCH_OBJECT) {
-				logger.info("Delete request couldn't find DN {} at the target LDAP.", dn);
+				logger.trace("Delete request couldn't find DN {} at the target LDAP.", dn);
 			}
 		}
 	}
