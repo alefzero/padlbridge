@@ -47,14 +47,13 @@ public class PBOrchestrator {
 		try {
 
 			for (PBSourceService source : sourcesInReverseOrder) {
-				logger.debug(PInfo.log("orchestrator.check-items-to-delete", source.getName()));
+				logger.info(PInfo.log("orchestrator.check-items-to-delete", source.getName()));
 				cache.syncUidsFromSource(source.getName(), source.getAllUids());
 				Deque<String> deletedDNs = target.deleteAll(cache.getAllDNsToBeDeletedFromSource(source.getName()));
 				cache.removeFromCacheByDN(source.getName(), deletedDNs);
 			}
-
 			for (PBSourceService source : sources) {
-				logger.debug(PInfo.log("orchestrator.check-items-to-add-or-modify", source.getName()));
+				logger.info(PInfo.log("orchestrator.check-items-to-add-or-modify", source.getName()));
 
 				Iterator<DataEntry> iterator = source.getAllEntries();
 
