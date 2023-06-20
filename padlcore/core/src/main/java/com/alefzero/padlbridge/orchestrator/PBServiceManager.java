@@ -109,6 +109,7 @@ public class PBServiceManager {
 			PBCacheService cacheService = cacheFactory.getInstance();
 			cacheConfig.checkConfiguration();
 			cacheService.setConfig(cacheConfig);
+			cacheService.setInstanceName(instanceConfig.getInstanceId());
 
 			PBTargetFactory targetFactory = getTargetFactoryByType(rootTree.get("target").get("type").asText());
 			TargetConfig targetConfig = mapper.treeToValue(rootTree.get("target"), targetFactory.getConfigClass());
