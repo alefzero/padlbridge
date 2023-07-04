@@ -15,7 +15,7 @@
 		</Logger>
 		<!-- <Logger name="com.alefzero.padlbridge.targets" level="trace" additivity="false"> 
 			<AppenderRef ref="Console" /> </Logger> -->
-		<Logger name="com.alefzero.padlbridge.cache.impl" level="trace"
+		<Logger name="com.alefzero.padlbridge.cache.*" level="trace"
 			additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
