@@ -49,7 +49,7 @@ public class GenericLdapTargetService extends PBTargetService {
 		try {
 			LDAPConnection conn = new LDAPConnection(config.getHost(), config.getPort(), config.getAdminUser(),
 					config.getAdminPassword());
-			pool = new LDAPConnectionPool(conn, 10);
+			pool = new LDAPConnectionPool(conn, 10, 10);
 		} catch (LDAPException e) {
 			e.printStackTrace();
 			logger.error("Error creating target LDAP connections.", e);
