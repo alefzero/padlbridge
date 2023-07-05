@@ -4,6 +4,7 @@ export CONFIG_FILE=$1
 export UPDATE_DELAY_SECS=30
 export PADL_RUN_FLAG=true
 export SLEEP_PID=
+export PADL_LOG_LEVEL="${PADL_LOG_LEVEL:-INFO}"
 
 trap end_padl_app INT TERM
 

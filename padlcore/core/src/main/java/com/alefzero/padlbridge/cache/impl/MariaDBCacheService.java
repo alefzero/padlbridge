@@ -275,7 +275,7 @@ public class MariaDBCacheService extends PBCacheService {
 				ps.setString(3, Objects.requireNonNull(uid));
 				ps.executeUpdate();
 				ps.close();
-			} else if (operationalAction == OperationalActions.ADD) {
+			} else if (operationalAction == OperationalActions.ADD || operationalAction == OperationalActions.REPLACE) {
 				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_INSERT_ENTRY_TO_CACHE));
 				ps.setString(1, Objects.requireNonNull(sourceName));
 				ps.setString(2, Objects.requireNonNull(uid));
