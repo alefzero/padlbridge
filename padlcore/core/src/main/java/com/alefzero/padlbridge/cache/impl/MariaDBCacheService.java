@@ -268,7 +268,7 @@ public class MariaDBCacheService extends PBCacheService {
 				".updateCacheWithData int cacheOperationValue={}, String sourceName={}, String uid={}, String dn={}, String hash={}",
 				operationalAction, sourceName, uid, dn, hash);
 		try (Connection conn = bds.getConnection()) {
-			if (operationalAction == OperationalActions.UPDATE) {
+			if (operationalAction == OperationalActions.REPLACE || operationalAction == OperationalActions.UPDATE) {
 				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_HASH_VALUE_OF));
 				ps.setString(1, Objects.requireNonNull(hash));
 				ps.setString(2, Objects.requireNonNull(sourceName));
