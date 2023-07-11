@@ -268,14 +268,20 @@ public class MariaDBCacheService extends PBCacheService {
 				".updateCacheWithData int cacheOperationValue={}, String sourceName={}, String uid={}, String dn={}, String hash={}",
 				operationalAction, sourceName, uid, dn, hash);
 		try (Connection conn = bds.getConnection()) {
-			if (operationalAction == OperationalActions.UPDATE) {
+			switch (operationalAction) {
+			case UPDATE: {
 				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_UPDATE_HASH_VALUE_OF));
 				ps.setString(1, Objects.requireNonNull(hash));
 				ps.setString(2, Objects.requireNonNull(sourceName));
 				ps.setString(3, Objects.requireNonNull(uid));
-				ps.executeUpdate();
+				int qtd = ps.executeUpdate();
 				ps.close();
-			} else if (operationalAction == OperationalActions.ADD || operationalAction == OperationalActions.REPLACE) {
+				if (qtd > 0) {
+					break;
+				}
+			}
+			case ADD:
+			case REPLACE: {
 				PreparedStatement ps = conn.prepareStatement(formatSQL(SQL_INSERT_ENTRY_TO_CACHE));
 				ps.setString(1, Objects.requireNonNull(sourceName));
 				ps.setString(2, Objects.requireNonNull(uid));
@@ -283,6 +289,10 @@ public class MariaDBCacheService extends PBCacheService {
 				ps.setString(4, Objects.requireNonNull(hash));
 				ps.executeUpdate();
 				ps.close();
+				break;
+			}
+			default:
+				// DO NOTHING
 			}
 		} catch (SQLException e) {
 			// TODO throw an unchecked recoverable exception or unrecoverable error
